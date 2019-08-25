@@ -1,0 +1,1 @@
+﻿SELECT typ_mater_id, nazwa FROM ewid4.osr_slo_typ_mater WHERE data_k IS NULL ORDER BY typ_mater_id

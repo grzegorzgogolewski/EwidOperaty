@@ -1,0 +1,1 @@
+﻿SELECT id_rodz_dok, opis, prefix, nazdok_id, gml_val FROM ewid4.kdok_rodz WHERE data_k IS NULL ORDER BY id_rodz_dok

@@ -1,0 +1,1 @@
+﻿SELECT operattyp_id, nazwa, skrot FROM ewid4.osr_slo_operat_typ WHERE data_k IS NULL ORDER BY operattyp_id

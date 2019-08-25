@@ -1,0 +1,1 @@
+﻿SELECT cel_id, nazwa, skrot, nazwa_skr FROM ewid4.osr_slo_cel_prac WHERE data_k IS NOT NULL ORDER BY nazwa

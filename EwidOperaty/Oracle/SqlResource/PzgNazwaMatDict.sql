@@ -1,0 +1,1 @@
+﻿SELECT nazmat_id, nazwa, nazwa_pelna, typ FROM ewid4.osr_slo_nazwa_mat WHERE data_k IS NULL ORDER BY nazmat_id

@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EwidOperaty", "EwidOperaty\EwidOperaty.csproj", "{467A1E45-BCB5-433B-919A-EC0D6BFCE99F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DevTest|Any CPU = DevTest|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{467A1E45-BCB5-433B-919A-EC0D6BFCE99F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{467A1E45-BCB5-433B-919A-EC0D6BFCE99F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{467A1E45-BCB5-433B-919A-EC0D6BFCE99F}.DevTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{467A1E45-BCB5-433B-919A-EC0D6BFCE99F}.DevTest|Any CPU.Build.0 = Debug|Any CPU
+		{467A1E45-BCB5-433B-919A-EC0D6BFCE99F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{467A1E45-BCB5-433B-919A-EC0D6BFCE99F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F7B544A6-EE8F-4800-A8F1-4300C9B0A788}
+	EndGlobalSection
+EndGlobal

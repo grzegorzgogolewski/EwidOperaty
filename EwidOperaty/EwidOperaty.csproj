@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{467A1E45-BCB5-433B-919A-EC0D6BFCE99F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>EwidOperaty</RootNamespace>
+    <AssemblyName>EwidOperaty</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\ikona.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EPPlus, Version=4.5.3.2, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.3.2\lib\net40\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="INIFileParser, Version=2.5.2.0, Culture=neutral, PublicKeyToken=79af7b307b65cf3c, processorArchitecture=MSIL">
+      <HintPath>..\packages\ini-parser.2.5.2\lib\net20\INIFileParser.dll</HintPath>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.122.18.3, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.18.6.0\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Oracle\Dictionary\SloCelPracyArchiwalny.cs" />
+    <Compile Include="Oracle\Dictionary\PzgCelPracy.cs" />
+    <Compile Include="Oracle\Dictionary\EgbGmina.cs" />
+    <Compile Include="Oracle\Dictionary\GmlDictionaryValues.cs" />
+    <Compile Include="Oracle\Dictionary\PzgKatArchiw.cs" />
+    <Compile Include="Oracle\Dictionary\PzgNazwaMat.cs" />
+    <Compile Include="Oracle\Dictionary\PzgNosnikNieelektroniczny.cs" />
+    <Compile Include="Oracle\Dictionary\EgbObrebEwidencyjny.cs" />
+    <Compile Include="Oracle\Dictionary\SloOperatTyp.cs" />
+    <Compile Include="Oracle\Dictionary\SloOsobaUprawniona.cs" />
+    <Compile Include="Oracle\Dictionary\PzgPodmiotZglaszajacy.cs" />
+    <Compile Include="Oracle\Dictionary\PzgPostac.cs" />
+    <Compile Include="Oracle\Dictionary\PzgRodzajDostepu.cs" />
+    <Compile Include="Oracle\Dictionary\PzgRodzajPracy.cs" />
+    <Compile Include="Oracle\Dictionary\PzgSposobPozyskania.cs" />
+    <Compile Include="Oracle\Dictionary\SloSzczRodzDok.cs" />
+    <Compile Include="Oracle\Dictionary\PzgTypMaterialu.cs" />
+    <Compile Include="Oracle\DbDictionary.cs" />
+    <Compile Include="Oracle\Dictionary\PzgMaterialZasobu.cs" />
+    <Compile Include="Oracle\Dictionary\PzgZgloszenie.cs" />
+    <Compile Include="Tools\Extensions.cs" />
+    <Compile Include="Tools\GlobalValues.cs" />
+    <Compile Include="Tools\IniConfig.cs" />
+    <Compile Include="Oracle\OracleWorker.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\SecurityTools.cs" />
+    <Compile Include="Oracle\SqlResource.cs" />
+    <Compile Include="Tools\Types.cs" />
+    <Compile Include="Tools\VbResource.cs" />
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Tools\VbResource\frmTworca.frm" />
+    <EmbeddedResource Include="Tools\VbResource\frmTworca.frx" />
+    <EmbeddedResource Include="Tools\VbResource\frmCel.frm" />
+    <EmbeddedResource Include="Tools\VbResource\frmCel.frx" />
+    <EmbeddedResource Include="Tools\VbResource\frmCelArchiwalny.frm" />
+    <EmbeddedResource Include="Tools\VbResource\frmCelArchiwalny.frx" />
+    <EmbeddedResource Include="Tools\VbResource\frmUprawniony.frm" />
+    <EmbeddedResource Include="Tools\VbResource\frmUprawniony.frx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgMaterialZasobuDictZakres.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgNosnikNieelektronicznyDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgTypMaterialuDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgNazwaMatDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\SloSzczRodzDokDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\EgbObrebEwidencyjnyDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\SloOperatTypDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgCelPracyDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\SloCelPracyArchiwalnyDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgRodzajPracyDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgPodmiotZglaszajacyDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\SloOsobaUprawnionaDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgSposobPozyskaniaDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Tools\VbResource\mdlMain.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ikona.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgZgloszenieDictZakres.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\EgbGminaDict.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\ToolsKdokWskBlob.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Oracle\SqlResource\PzgMaterialZasobuDictBezZakres.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Tools\VbResource\PZG_MaterialZasobu.vb" />
+    <EmbeddedResource Include="Oracle\SqlResource\PzgZgloszenieDictBezZakres.sql" />
+    <EmbeddedResource Include="Oracle\SqlResource\PzgZgloszenieBezZakres.sql" />
+    <EmbeddedResource Include="Oracle\SqlResource\PzgZgloszenieZakres.sql" />
+    <Content Include="Oracle\SqlResource\ToolsLiczbaSkanow.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,1 @@
+﻿SELECT rodznos_id, nazwa, nazwa_pelna FROM ewid4.osr_slo_rodz_nosnika WHERE data_k IS NULL ORDER BY rodznos_id

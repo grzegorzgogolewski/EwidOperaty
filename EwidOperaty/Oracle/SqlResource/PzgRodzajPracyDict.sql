@@ -1,0 +1,1 @@
+﻿SELECT rodz_id, nazwa, nazwa_pelna FROM ewid4.osr_slo_rodzaj_pracy WHERE data_k IS NULL ORDER By rodz_id
