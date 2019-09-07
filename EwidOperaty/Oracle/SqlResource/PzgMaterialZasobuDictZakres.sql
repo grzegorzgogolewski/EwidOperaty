@@ -32,8 +32,8 @@ SELECT
     (SELECT dlk FROM (SELECT idop, wm_concat(dlk) dlk FROM (select distinct od.idop, SUBSTR(EW_DLK_IDG5(d.mslink), 15, 10) dlk from osr_operat_dlk od join kdzialka d using(dzialka_id) where od.stan_po = 1 union select distinct od.idop, SUBSTR(EW_DLK_IDG5(d.mslink), 15, 10) dlk from osr_operat_dlk od join kdzialka_a d using(dzialka_id) where od.stan_po = 1) GROUP BY idop) dz WHERE dz.idop = op.idop) dzialkaPo,
     op.uwagi opis2,
     op.data_wplywu dataWplywu,
-    (SELECT count(*) FROM kdok_wsk kd WHERE kd.id_gr = op.idop AND wl = 'operat') liczba_skanow,
-    (SELECT count(*) FROM kdok_wsk kd WHERE wl = 'szkice' AND kd.id_gr IN (SELECT mat_id FROM osr_operat_sklad os WHERE os.idop = op.idop)) liczba_doks,
+    (SELECT count(*) FROM kdok_wsk kd WHERE kd.id_gr = op.idop AND wl = 'operat' and data_k IS NULL) liczba_skanow,
+    (SELECT count(*) FROM kdok_wsk kd WHERE wl = 'szkice' AND kd.id_gr IN (SELECT mat_id FROM osr_operat_sklad os WHERE os.idop = op.idop) and data_k IS NULL) liczba_doks,
 	op.kerg_id
 FROM 
     ewid4.osr_operat op 

@@ -21,6 +21,8 @@ WHERE
 	--AND UPPER(kd.path) NOT LIKE '%.JPG'
 	--AND UPPER(kd.path) NOT LIKE '%.PDF'
     AND NVL(op.obreb_id, 0) = :obreb_id
+	--and op.idop IN (select idop from osr_operat where idmaterialu in (select idmaterialu from gg_operaty))
+	--and kd.data_d >= TO_DATE('20-04-2019 00:00','DD-MM-YYYY HH24.MI')
 UNION ALL
 SELECT 
     kd.id_dok,
@@ -46,3 +48,5 @@ WHERE
 	--AND UPPER(kd.path) NOT LIKE '%.JPG'
 	--AND UPPER(kd.path) NOT LIKE '%.PDF'
 	AND NVL(op.obreb_id, 0) = :obreb_id
+	--and op.idop IN (select idop from osr_operat where idmaterialu in (select idmaterialu from gg_operaty))
+	--and kd.data_d >= TO_DATE('20-04-2019 00:00','DD-MM-YYYY HH24.MI')
