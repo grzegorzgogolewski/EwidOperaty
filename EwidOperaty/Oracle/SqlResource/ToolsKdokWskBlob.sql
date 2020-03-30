@@ -7,7 +7,8 @@
     kd.path,
     kd.id_rodz_dok,
     kd.opis,
-    CASE SDO_EQUAL(kd.geom, op.geom) WHEN 'FALSE' THEN SDO_UTIL.TO_WKTGEOMETRY(kd.geom) ELSE NULL END geom,
+    SDO_UTIL.TO_WKTGEOMETRY(kd.geom) geom,
+    --CASE SDO_EQUAL(kd.geom, op.geom) WHEN 'FALSE' THEN SDO_UTIL.TO_WKTGEOMETRY(kd.geom) ELSE NULL END geom,
     blk.typ_pliku,
     blk.data,
     kd.data_d
@@ -22,7 +23,7 @@ WHERE
 	--AND UPPER(kd.path) NOT LIKE '%.PDF'
     AND NVL(op.obreb_id, 0) = :obreb_id
 	--and op.idop IN (select idop from osr_operat where idmaterialu in (select idmaterialu from gg_operaty))
-	--and kd.data_d >= TO_DATE('20-04-2019 00:00','DD-MM-YYYY HH24.MI')
+	--and kd.data_d >= TO_DATE('10-07-2019 09:02:14','DD-MM-YYYY hh24:mi:ss')
 UNION ALL
 SELECT 
     kd.id_dok,
@@ -33,7 +34,8 @@ SELECT
     kd.path,
     kd.id_rodz_dok,
     kd.opis,
-    CASE SDO_EQUAL(kd.geom, op.geom) WHEN 'FALSE' THEN SDO_UTIL.TO_WKTGEOMETRY(kd.geom) ELSE NULL END geom,
+    SDO_UTIL.TO_WKTGEOMETRY(kd.geom) geom,
+    --CASE SDO_EQUAL(kd.geom, op.geom) WHEN 'FALSE' THEN SDO_UTIL.TO_WKTGEOMETRY(kd.geom) ELSE NULL END geom,
 	blk.typ_pliku,
     blk.data,
     kd.data_d
@@ -49,4 +51,4 @@ WHERE
 	--AND UPPER(kd.path) NOT LIKE '%.PDF'
 	AND NVL(op.obreb_id, 0) = :obreb_id
 	--and op.idop IN (select idop from osr_operat where idmaterialu in (select idmaterialu from gg_operaty))
-	--and kd.data_d >= TO_DATE('20-04-2019 00:00','DD-MM-YYYY HH24.MI')
+	--and kd.data_d >= TO_DATE('10-07-2019 09:02:14','DD-MM-YYYY hh24:mi:ss')

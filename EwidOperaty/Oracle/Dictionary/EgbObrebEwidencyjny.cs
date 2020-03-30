@@ -32,6 +32,11 @@ namespace EwidOperaty.Oracle.Dictionary
             return Values.Where(o => o.Mslink == obrebId).ToList()[0].ListId;
         }
 
+        public string GetListIdGus(string numerGus)
+        {
+            return Values.Where(o => o.NumerGus == numerGus).ToList()[0].ListId;
+        }
+
 
     }
 }

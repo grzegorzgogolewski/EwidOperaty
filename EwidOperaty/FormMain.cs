@@ -24,6 +24,7 @@ namespace EwidOperaty
         private readonly BackgroundWorker _getDataBackgroundWorker = new BackgroundWorker { WorkerReportsProgress = true };
         private readonly BackgroundWorker _saveDataBackgroundWorker = new BackgroundWorker { WorkerReportsProgress = true };
         private readonly BackgroundWorker _saveBlobBackgroundWorker = new BackgroundWorker { WorkerReportsProgress = true };
+        private readonly BackgroundWorker _saveWktBackgroundWorker = new BackgroundWorker { WorkerReportsProgress = true };
 
         public FormMain()
         {
@@ -40,6 +41,10 @@ namespace EwidOperaty
             _saveBlobBackgroundWorker.DoWork += SaveBlobBackgroundWorkerOnDoWork;
             _saveBlobBackgroundWorker.RunWorkerCompleted += SaveBlobBackgroundWorkerOnRunWorkerCompleted;
             _saveBlobBackgroundWorker.ProgressChanged += SaveBlobBackgroundWorkerOnProgressChanged;
+
+            _saveWktBackgroundWorker.DoWork += SaveWktBackgroundWorkerOnDoWork;
+            _saveWktBackgroundWorker.RunWorkerCompleted += SaveWktBackgroundWorkerOnRunWorkerCompleted;
+            _saveWktBackgroundWorker.ProgressChanged += SaveWktBackgroundWorkerOnProgressChanged;
         }
 
         // Procedura ładowania głównego okna aplikacji
@@ -54,18 +59,20 @@ namespace EwidOperaty
 
             groupBoxConnection.Text = @"Parametry połączenia";
 
-            buttonConnect.Text = @"Połącz";
-            buttonDisconnect.Text = @"Rozłącz";
-            buttonOracleRead.Text = @"Wczytaj dane z bazy";
-            buttonSaveData.Text = @"Zapisz dane do XLS";
-            buttonSaveBlobToDisk.Text = @"Zapisz skany na dysk";
-            checkBoxZakres.Text = @"Wczytać zakresy operatów?";
-            checkBoxBezObreb.Text = @"Wczytać operaty bez obrębów?";
+            buttonConnect.Text = "Połącz";
+            buttonDisconnect.Text = "Rozłącz";
+            buttonOracleRead.Text = "Wczytaj dane o operatach";
+            buttonSaveData.Text = "Zapisz dane do XLS";
+            buttonSaveBlobToDisk.Text = "Zapisz skany na dysk";
+            buttonSaveWktToDisk.Text = "Zapisz WKT na dysk";
+            checkBoxZakres.Text = "Wczytać zakresy operatów?";
+            checkBoxBezObreb.Text = "Wczytać operaty bez obrębów?";
 
             buttonDisconnect.Enabled = false;
             buttonOracleRead.Enabled = false;
             buttonSaveData.Enabled = false;
             buttonSaveBlobToDisk.Enabled = false;
+            buttonSaveWktToDisk.Enabled = false;
 
             textBoxHost.Text = IniConfig.ReadIni("Database", "Host");
             textBoxDatabase.Text = IniConfig.ReadIni("Database", "Database");
@@ -148,6 +155,7 @@ namespace EwidOperaty
             buttonDisconnect.Enabled = false;
             buttonSaveData.Enabled = false;
             buttonSaveBlobToDisk.Enabled = false;
+            buttonSaveWktToDisk.Enabled = false;
 
             _getDataBackgroundWorker.RunWorkerAsync();
         }
@@ -260,8 +268,9 @@ namespace EwidOperaty
             buttonDisconnect.Enabled = true;
             buttonSaveData.Enabled = true;
             buttonSaveBlobToDisk.Enabled = true;
+            buttonSaveWktToDisk.Enabled = true;
 
-            toolStripStatusLabel.Text = $@"Pobrano {DbDictionary.PzgMaterialZasobu.Count} operatów oraz {DbDictionary.PzgZgloszenie.Count} zgłoszeń z bazy.";
+            toolStripStatusLabel.Text = $"Pobrano {DbDictionary.PzgMaterialZasobu.Count} operatów oraz {DbDictionary.PzgZgloszenie.Count} zgłoszeń z bazy.";
         }
 
         private void ButtonSaveData_Click(object sender, EventArgs e)
@@ -281,6 +290,7 @@ namespace EwidOperaty
             buttonOracleRead.Enabled = false;
             buttonSaveData.Enabled = false;
             buttonSaveBlobToDisk.Enabled = false;
+            buttonSaveWktToDisk.Enabled = false;
 
             if (File.Exists(fileName))
             {
@@ -316,33 +326,45 @@ namespace EwidOperaty
             // Zapisywanie zakresów dla zgłoszeń
             using (StreamWriter csv = new StreamWriter(File.Open(Path.Combine(xlsFile.DirectoryName ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(xlsFile.Name) + "_zgloszenia.csv"), FileMode.Create), Encoding.UTF8))
             {
-                csv.WriteLine("kerg_id,pzg_idZgloszenia,pzg_polozenieObszaru");
+                csv.WriteLine("kerg_id,pzg_idZgloszenia,obreb,pzg_polozenieObszaru");
 
                 foreach (PzgZgloszenie kerg in DbDictionary.PzgZgloszenie.Values)
                 {
                     if (kerg.PzgPolozenieObszaru != string.Empty)
                     {
-                        csv.WriteLine(kerg.KergId + "," + kerg.PzgIdZgloszenia + ",\"" + kerg.PzgPolozenieObszaru + "\"");
+                        csv.WriteLine(kerg.KergId + "," + kerg.PzgIdZgloszenia + "," + kerg.Obreb + ",\"" + kerg.PzgPolozenieObszaru + "\"");
 
-                        kerg.PzgPolozenieObszaru = @"Istnieje";
+                        string folderObrebName = string.IsNullOrEmpty(kerg.Obreb) ? "[brak obrębu] XXX ZGL" : DbDictionary.EgbObrebEwidencyjny.GetListIdGus(kerg.Obreb) + " ZGL";
+
+                        string fileName = kerg.PzgIdZgloszenia.Replace('/', '_') + ".wkt";
+
+                        DirectoryInfo zgloszeniaOutputDir = Directory.CreateDirectory(Path.Combine(xlsFile.DirectoryName, folderObrebName));
+
+                        File.WriteAllText(Path.Combine(zgloszeniaOutputDir.FullName, fileName), kerg.PzgPolozenieObszaru, Encoding.UTF8);
+
+                        kerg.PzgPolozenieObszaru = "Istnieje";
                     }
                 }
             }
 
             toolStripStatusLabel.Text = @"Zapisywanie zakresów dla operatów...";
 
+            DirectoryInfo operatyDirectoryInfo = Directory.CreateDirectory(Path.Combine(xlsFile.DirectoryName ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(xlsFile.Name) + "_operaty"));
+
             // Zapisywanie zakresów dla operatów
             using (StreamWriter csv = new StreamWriter(File.Open(Path.Combine(xlsFile.DirectoryName ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(xlsFile.Name) + "_operaty.csv"), FileMode.Create), Encoding.UTF8))
             {
-                csv.WriteLine("idop,pzg_IdMaterialu,pzg_oznMaterialuZasobu,pzg_polozenieObszaru");
+                csv.WriteLine("idop,pzg_IdMaterialu,pzg_oznMaterialuZasobu,obreb,pzg_polozenieObszaru");
 
                 foreach (PzgMaterialZasobu oper in DbDictionary.PzgMaterialZasobu.Values)
                 {
                     if (oper.PzgPolozenieObszaru != string.Empty)
                     {
-                        csv.WriteLine(oper.IdOp + "," + oper.PzgIdMaterialu + "," + oper.PzgOznMaterialuZasobu + ",\"" + oper.PzgPolozenieObszaru + "\"");
+                        csv.WriteLine(oper.IdOp + "," + oper.PzgIdMaterialu + "," + oper.PzgOznMaterialuZasobu + "," + oper.Obreb + ",\"" + oper.PzgPolozenieObszaru + "\"");
+                        
+                        File.WriteAllText(Path.Combine(operatyDirectoryInfo.FullName, string.IsNullOrEmpty(oper.PzgIdMaterialu) ? oper.Obreb + '_' + oper.PzgOznMaterialuZasobu.Replace('/', '_') + ".wkt" : oper.PzgIdMaterialu  + ".wkt"), oper.PzgPolozenieObszaru, Encoding.UTF8);
 
-                        oper.PzgPolozenieObszaru = @"Istnieje";
+                        oper.PzgPolozenieObszaru = "Istnieje";
                     }
                 }
             }
@@ -984,6 +1006,7 @@ namespace EwidOperaty
             buttonSaveData.Enabled = true;
             buttonOracleRead.Enabled = true;
             buttonSaveBlobToDisk.Enabled = true;
+            buttonSaveWktToDisk.Enabled = true;
 
             toolStripStatusLabel.Text = @"Plik zapisano.";
         }
@@ -1041,6 +1064,7 @@ namespace EwidOperaty
             buttonSaveBlobToDisk.Enabled = false;
             buttonOracleRead.Enabled = false;
             buttonSaveData.Enabled = false;
+            buttonSaveWktToDisk.Enabled = false;
 
             _saveBlobBackgroundWorker.RunWorkerAsync(argument: fbd.SelectedPath);
         }
@@ -1077,9 +1101,70 @@ namespace EwidOperaty
             buttonSaveBlobToDisk.Enabled = true;
             buttonOracleRead.Enabled = true;
             buttonSaveData.Enabled = true;
-
+            buttonSaveWktToDisk.Enabled = true;
 
             MessageBox.Show(@"Zapisano pliki na dysk", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ButtonSaveWktToDisk_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog()
+            {
+                SelectedPath = IniConfig.ReadIni("Files", "RecentFolder")
+            };
+
+            DialogResult result = fbd.ShowDialog();
+
+            if (result != DialogResult.OK)
+            {
+                return;
+            }
+
+            IniConfig.SaveIni("Files", "RecentFolder", fbd.SelectedPath);
+
+            buttonSaveBlobToDisk.Enabled = false;
+            buttonOracleRead.Enabled = false;
+            buttonSaveData.Enabled = false;
+            buttonSaveWktToDisk.Enabled = false;
+
+            _saveWktBackgroundWorker.RunWorkerAsync(argument: fbd.SelectedPath);
+        }
+
+        private void SaveWktBackgroundWorkerOnDoWork(object sender, DoWorkEventArgs e)
+        {
+            string folderName = e.Argument.ToString();
+
+            if (GlobalValues.OperatyBezObrebChecked)
+            {
+                _oracleWorker.SaveWktForObreb(0, folderName);
+            }
+
+            int counter = 1;
+
+            foreach (object obreb in checkedListBoxObreby.CheckedItems)
+            {
+                toolStripStatusLabel.Text = $"Zapisywanie plików WKT dla obrębu: {obreb}";
+
+                _oracleWorker.SaveWktForObreb(DbDictionary.EgbObrebEwidencyjny.GetObrebId(obreb.ToString()), folderName);
+
+                int percentage = (counter++ * 100) / checkedListBoxObreby.CheckedItems.Count;
+                _saveWktBackgroundWorker.ReportProgress(percentage);
+            }
+        }
+
+        private void SaveWktBackgroundWorkerOnProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            progressBar.Value = e.ProgressPercentage;
+        }
+
+        private void SaveWktBackgroundWorkerOnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            buttonSaveBlobToDisk.Enabled = true;
+            buttonOracleRead.Enabled = true;
+            buttonSaveData.Enabled = true;
+            buttonSaveWktToDisk.Enabled = true;
+
+            MessageBox.Show(@"Zapisano pliki WKT na dysk", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // obsługa filtrowania obrębów na podstawie wybranych gmin
@@ -1138,6 +1223,8 @@ namespace EwidOperaty
                 GlobalValues.OperatyBezObrebChecked = checkBox.Checked;
             }
         }
+
+        
     }
 }
 

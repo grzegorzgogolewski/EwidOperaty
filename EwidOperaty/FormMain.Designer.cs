@@ -57,11 +57,14 @@
             this.checkBoxZakres = new System.Windows.Forms.CheckBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.checkBoxBezObreb = new System.Windows.Forms.CheckBox();
+            this.buttonSaveWktToDisk = new System.Windows.Forms.Button();
+            this.groupBoxOperacje = new System.Windows.Forms.GroupBox();
             this.groupBoxConnection.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.contextMenuObreby.SuspendLayout();
             this.groupBoxPodzialAdministracyjny.SuspendLayout();
             this.contextMenuGminy.SuspendLayout();
+            this.groupBoxOperacje.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBoxConnection
@@ -178,9 +181,9 @@
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 314);
+            this.statusStrip.Location = new System.Drawing.Point(0, 369);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(672, 22);
+            this.statusStrip.Size = new System.Drawing.Size(673, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -193,7 +196,7 @@
             // buttonOracleRead
             // 
             this.buttonOracleRead.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonOracleRead.Location = new System.Drawing.Point(206, 262);
+            this.buttonOracleRead.Location = new System.Drawing.Point(6, 19);
             this.buttonOracleRead.Name = "buttonOracleRead";
             this.buttonOracleRead.Size = new System.Drawing.Size(150, 23);
             this.buttonOracleRead.TabIndex = 10;
@@ -204,7 +207,7 @@
             // buttonSaveBlobToDisk
             // 
             this.buttonSaveBlobToDisk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonSaveBlobToDisk.Location = new System.Drawing.Point(518, 262);
+            this.buttonSaveBlobToDisk.Location = new System.Drawing.Point(234, 19);
             this.buttonSaveBlobToDisk.Name = "buttonSaveBlobToDisk";
             this.buttonSaveBlobToDisk.Size = new System.Drawing.Size(150, 23);
             this.buttonSaveBlobToDisk.TabIndex = 10;
@@ -291,7 +294,7 @@
             // buttonSaveData
             // 
             this.buttonSaveData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonSaveData.Location = new System.Drawing.Point(362, 262);
+            this.buttonSaveData.Location = new System.Drawing.Point(6, 48);
             this.buttonSaveData.Name = "buttonSaveData";
             this.buttonSaveData.Size = new System.Drawing.Size(150, 23);
             this.buttonSaveData.TabIndex = 14;
@@ -313,9 +316,9 @@
             // progressBar
             // 
             this.progressBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar.Location = new System.Drawing.Point(0, 291);
+            this.progressBar.Location = new System.Drawing.Point(0, 346);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(672, 23);
+            this.progressBar.Size = new System.Drawing.Size(673, 23);
             this.progressBar.TabIndex = 16;
             // 
             // checkBoxBezObreb
@@ -329,18 +332,40 @@
             this.checkBoxBezObreb.UseVisualStyleBackColor = true;
             this.checkBoxBezObreb.CheckedChanged += new System.EventHandler(this.CheckBoxBezObreb_CheckedChanged);
             // 
+            // buttonSaveWktToDisk
+            // 
+            this.buttonSaveWktToDisk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonSaveWktToDisk.Location = new System.Drawing.Point(234, 48);
+            this.buttonSaveWktToDisk.Name = "buttonSaveWktToDisk";
+            this.buttonSaveWktToDisk.Size = new System.Drawing.Size(150, 23);
+            this.buttonSaveWktToDisk.TabIndex = 18;
+            this.buttonSaveWktToDisk.Text = "buttonSaveWktToDisk";
+            this.buttonSaveWktToDisk.UseVisualStyleBackColor = true;
+            this.buttonSaveWktToDisk.Click += new System.EventHandler(this.ButtonSaveWktToDisk_Click);
+            // 
+            // groupBoxOperacje
+            // 
+            this.groupBoxOperacje.Controls.Add(this.buttonOracleRead);
+            this.groupBoxOperacje.Controls.Add(this.buttonSaveWktToDisk);
+            this.groupBoxOperacje.Controls.Add(this.buttonSaveData);
+            this.groupBoxOperacje.Controls.Add(this.buttonSaveBlobToDisk);
+            this.groupBoxOperacje.Location = new System.Drawing.Point(206, 263);
+            this.groupBoxOperacje.Name = "groupBoxOperacje";
+            this.groupBoxOperacje.Size = new System.Drawing.Size(462, 79);
+            this.groupBoxOperacje.TabIndex = 19;
+            this.groupBoxOperacje.TabStop = false;
+            this.groupBoxOperacje.Text = "Operacje";
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(672, 336);
+            this.ClientSize = new System.Drawing.Size(673, 391);
+            this.Controls.Add(this.groupBoxOperacje);
             this.Controls.Add(this.checkBoxBezObreb);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.checkBoxZakres);
-            this.Controls.Add(this.buttonSaveData);
             this.Controls.Add(this.groupBoxPodzialAdministracyjny);
-            this.Controls.Add(this.buttonSaveBlobToDisk);
-            this.Controls.Add(this.buttonOracleRead);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.groupBoxConnection);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -356,6 +381,7 @@
             this.contextMenuObreby.ResumeLayout(false);
             this.groupBoxPodzialAdministracyjny.ResumeLayout(false);
             this.contextMenuGminy.ResumeLayout(false);
+            this.groupBoxOperacje.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -391,6 +417,8 @@
         private System.Windows.Forms.CheckBox checkBoxZakres;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.CheckBox checkBoxBezObreb;
+        private System.Windows.Forms.Button buttonSaveWktToDisk;
+        private System.Windows.Forms.GroupBox groupBoxOperacje;
     }
 }
 

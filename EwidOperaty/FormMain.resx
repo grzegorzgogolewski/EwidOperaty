@@ -121,9 +121,9 @@
     <value>16, 11</value>
   </metadata>
   <metadata name="contextMenuObreby.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>266, 17</value>
+    <value>271, 16</value>
   </metadata>
   <metadata name="contextMenuGminy.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>113, 15</value>
+    <value>113, 10</value>
   </metadata>
 </root>

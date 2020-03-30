@@ -3,6 +3,7 @@ using EwidOperaty.Tools;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace EwidOperaty.Oracle
@@ -822,6 +823,68 @@ namespace EwidOperaty.Oracle
                     MessageBox.Show(e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
+            }
+        }
+
+        public void SaveWktForObreb(int obrebId, string dirName)
+        {
+            string obrebListId = obrebId == 0 ? "[brak obrębu] XXX" : DbDictionary.EgbObrebEwidencyjny.GetListId(obrebId);
+
+            using (OracleCommand command = _oracleConnection.CreateCommand()) // polecenie dla połączenia
+            {
+                OracleParameter obrebIdOracleParameter = new OracleParameter
+                {
+                    OracleDbType = OracleDbType.Int32,
+                    ParameterName = "obreb_id"
+                };
+
+                command.CommandText = SqlResource.GetSqlText("ToolsKdokWskBlob.sql");
+                command.Parameters.Clear();
+                command.Parameters.Add(obrebIdOracleParameter);
+                obrebIdOracleParameter.Value = obrebId;
+
+                try
+                {
+                    using (OracleDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int idOp = reader.GetIntId("idop");
+                            string typPliku = reader.GetString("typ_pliku");
+                            string geom = reader.GetString("geom");
+                            DateTime dataD = (DateTime)reader["data_d"];
+
+                            string outDirectory = DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) != string.Empty ?
+                                DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) : DbDictionary.PzgMaterialZasobu.GetOznMaterialuZasobu(idOp).Replace('/', '_');
+
+                            if (!Directory.Exists(Path.Combine(dirName, obrebListId, outDirectory)))
+                            {
+                                Directory.CreateDirectory(Path.Combine(dirName, obrebListId, outDirectory));
+                            }
+
+                            string fileName = Path.GetFileNameWithoutExtension(typPliku);
+                            const string ext = ".wkt";
+
+                            string fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, fileName + ext);
+
+                            int counter = 2;
+
+                            while (File.Exists(fileNameAndPath))
+                            {
+                                fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, fileName + "_" + $"{counter++:000}" + ext);
+                            }
+
+                            File.WriteAllText(fileNameAndPath, geom, Encoding.UTF8);
+
+                            File.SetLastWriteTime(fileNameAndPath, dataD);
+                            File.SetCreationTime(fileNameAndPath, dataD);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
     }
