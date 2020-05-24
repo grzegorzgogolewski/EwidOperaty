@@ -54,11 +54,13 @@
             this.contextMenuGminy_ZaznaczWszystko = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuGminy_OdznaczWszystko = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonSaveData = new System.Windows.Forms.Button();
-            this.checkBoxZakres = new System.Windows.Forms.CheckBox();
+            this.checkBoxZakresRead = new System.Windows.Forms.CheckBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.checkBoxBezObreb = new System.Windows.Forms.CheckBox();
             this.buttonSaveWktToDisk = new System.Windows.Forms.Button();
             this.groupBoxOperacje = new System.Windows.Forms.GroupBox();
+            this.checkBoxZakresZglWrite = new System.Windows.Forms.CheckBox();
+            this.checkBoxZakresOprWrite = new System.Windows.Forms.CheckBox();
             this.groupBoxConnection.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.contextMenuObreby.SuspendLayout();
@@ -181,9 +183,9 @@
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 369);
+            this.statusStrip.Location = new System.Drawing.Point(0, 374);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(673, 22);
+            this.statusStrip.Size = new System.Drawing.Size(674, 22);
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -207,7 +209,7 @@
             // buttonSaveBlobToDisk
             // 
             this.buttonSaveBlobToDisk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonSaveBlobToDisk.Location = new System.Drawing.Point(234, 19);
+            this.buttonSaveBlobToDisk.Location = new System.Drawing.Point(162, 19);
             this.buttonSaveBlobToDisk.Name = "buttonSaveBlobToDisk";
             this.buttonSaveBlobToDisk.Size = new System.Drawing.Size(150, 23);
             this.buttonSaveBlobToDisk.TabIndex = 10;
@@ -302,23 +304,22 @@
             this.buttonSaveData.UseVisualStyleBackColor = true;
             this.buttonSaveData.Click += new System.EventHandler(this.ButtonSaveData_Click);
             // 
-            // checkBoxZakres
+            // checkBoxZakresRead
             // 
-            this.checkBoxZakres.AutoSize = true;
-            this.checkBoxZakres.Location = new System.Drawing.Point(22, 266);
-            this.checkBoxZakres.Name = "checkBoxZakres";
-            this.checkBoxZakres.Size = new System.Drawing.Size(107, 17);
-            this.checkBoxZakres.TabIndex = 15;
-            this.checkBoxZakres.Text = "checkBoxZakres";
-            this.checkBoxZakres.UseVisualStyleBackColor = true;
-            this.checkBoxZakres.CheckedChanged += new System.EventHandler(this.CheckBoxZakres_CheckedChanged);
+            this.checkBoxZakresRead.AutoSize = true;
+            this.checkBoxZakresRead.Location = new System.Drawing.Point(22, 266);
+            this.checkBoxZakresRead.Name = "checkBoxZakresRead";
+            this.checkBoxZakresRead.Size = new System.Drawing.Size(133, 17);
+            this.checkBoxZakresRead.TabIndex = 15;
+            this.checkBoxZakresRead.Text = "checkBoxZakresRead";
+            this.checkBoxZakresRead.UseVisualStyleBackColor = true;
+            this.checkBoxZakresRead.CheckedChanged += new System.EventHandler(this.CheckBoxZakresRead_CheckedChanged);
             // 
             // progressBar
             // 
-            this.progressBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.progressBar.Location = new System.Drawing.Point(0, 346);
+            this.progressBar.Location = new System.Drawing.Point(5, 346);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(673, 23);
+            this.progressBar.Size = new System.Drawing.Size(663, 23);
             this.progressBar.TabIndex = 16;
             // 
             // checkBoxBezObreb
@@ -335,7 +336,7 @@
             // buttonSaveWktToDisk
             // 
             this.buttonSaveWktToDisk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonSaveWktToDisk.Location = new System.Drawing.Point(234, 48);
+            this.buttonSaveWktToDisk.Location = new System.Drawing.Point(162, 48);
             this.buttonSaveWktToDisk.Name = "buttonSaveWktToDisk";
             this.buttonSaveWktToDisk.Size = new System.Drawing.Size(150, 23);
             this.buttonSaveWktToDisk.TabIndex = 18;
@@ -356,15 +357,39 @@
             this.groupBoxOperacje.TabStop = false;
             this.groupBoxOperacje.Text = "Operacje";
             // 
+            // checkBoxZakresZglWrite
+            // 
+            this.checkBoxZakresZglWrite.AutoSize = true;
+            this.checkBoxZakresZglWrite.Location = new System.Drawing.Point(22, 289);
+            this.checkBoxZakresZglWrite.Name = "checkBoxZakresZglWrite";
+            this.checkBoxZakresZglWrite.Size = new System.Drawing.Size(147, 17);
+            this.checkBoxZakresZglWrite.TabIndex = 20;
+            this.checkBoxZakresZglWrite.Text = "checkBoxZakresZglWrite";
+            this.checkBoxZakresZglWrite.UseVisualStyleBackColor = true;
+            this.checkBoxZakresZglWrite.CheckedChanged += new System.EventHandler(this.CheckBoxZakresZglWrite_CheckedChanged);
+            // 
+            // checkBoxZakresOprWrite
+            // 
+            this.checkBoxZakresOprWrite.AutoSize = true;
+            this.checkBoxZakresOprWrite.Location = new System.Drawing.Point(22, 311);
+            this.checkBoxZakresOprWrite.Name = "checkBoxZakresOprWrite";
+            this.checkBoxZakresOprWrite.Size = new System.Drawing.Size(149, 17);
+            this.checkBoxZakresOprWrite.TabIndex = 21;
+            this.checkBoxZakresOprWrite.Text = "checkBoxZakresOprWrite";
+            this.checkBoxZakresOprWrite.UseVisualStyleBackColor = true;
+            this.checkBoxZakresOprWrite.CheckedChanged += new System.EventHandler(this.CheckBoxZakresOprWrite_CheckedChanged);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(673, 391);
+            this.ClientSize = new System.Drawing.Size(674, 396);
+            this.Controls.Add(this.checkBoxZakresOprWrite);
+            this.Controls.Add(this.checkBoxZakresZglWrite);
             this.Controls.Add(this.groupBoxOperacje);
             this.Controls.Add(this.checkBoxBezObreb);
             this.Controls.Add(this.progressBar);
-            this.Controls.Add(this.checkBoxZakres);
+            this.Controls.Add(this.checkBoxZakresRead);
             this.Controls.Add(this.groupBoxPodzialAdministracyjny);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.groupBoxConnection);
@@ -374,6 +399,7 @@
             this.Text = "FormMain";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
+            this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.groupBoxConnection.ResumeLayout(false);
             this.groupBoxConnection.PerformLayout();
             this.statusStrip.ResumeLayout(false);
@@ -414,11 +440,13 @@
         private System.Windows.Forms.Button buttonSaveData;
         private System.Windows.Forms.ToolStripMenuItem contextMenuGminy_OdznaczWszystko;
         private System.Windows.Forms.ToolStripMenuItem contextMenuObreby_OdzaznaczWszystko;
-        private System.Windows.Forms.CheckBox checkBoxZakres;
+        private System.Windows.Forms.CheckBox checkBoxZakresRead;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.CheckBox checkBoxBezObreb;
         private System.Windows.Forms.Button buttonSaveWktToDisk;
         private System.Windows.Forms.GroupBox groupBoxOperacje;
+        private System.Windows.Forms.CheckBox checkBoxZakresZglWrite;
+        private System.Windows.Forms.CheckBox checkBoxZakresOprWrite;
     }
 }
 

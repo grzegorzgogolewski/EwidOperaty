@@ -12,9 +12,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using License;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 using OfficeOpenXml.DataValidation;
 using OfficeOpenXml.DataValidation.Contracts;
+using static EwidOperaty.Tools.GlobalValues;
 
 namespace EwidOperaty
 {
@@ -65,8 +67,10 @@ namespace EwidOperaty
             buttonSaveData.Text = "Zapisz dane do XLS";
             buttonSaveBlobToDisk.Text = "Zapisz skany na dysk";
             buttonSaveWktToDisk.Text = "Zapisz WKT na dysk";
-            checkBoxZakres.Text = "Wczytać zakresy operatów?";
             checkBoxBezObreb.Text = "Wczytać operaty bez obrębów?";
+            checkBoxZakresRead.Text = "Wczytać zakresy?";
+            checkBoxZakresZglWrite.Text = "Zapisać zakresy zgłoszeń?";
+            checkBoxZakresOprWrite.Text = "Zapisać zakresy operatów?";
 
             buttonDisconnect.Enabled = false;
             buttonOracleRead.Enabled = false;
@@ -74,14 +78,17 @@ namespace EwidOperaty
             buttonSaveBlobToDisk.Enabled = false;
             buttonSaveWktToDisk.Enabled = false;
 
+            Location = new Point(Convert.ToInt32(IniConfig.ReadIni("FormMain", "X")), Convert.ToInt32(IniConfig.ReadIni("FormMain", "Y")));
+
             textBoxHost.Text = IniConfig.ReadIni("Database", "Host");
             textBoxDatabase.Text = IniConfig.ReadIni("Database", "Database");
             textBoxUser.Text = IniConfig.ReadIni("Database", "User").UnProtectString();
             textBoxPass.Text = IniConfig.ReadIni("Database", "Pass").UnProtectString();
-            checkBoxZakres.Checked = Convert.ToBoolean(IniConfig.ReadIni("FormMain", "checkBoxZakres"));
-            checkBoxBezObreb.Checked = Convert.ToBoolean(IniConfig.ReadIni("FormMain", "checkBoxBezObreb"));
 
-            Location = new Point(Convert.ToInt32(IniConfig.ReadIni("FormMain", "X")), Convert.ToInt32(IniConfig.ReadIni("FormMain", "Y")));
+            checkBoxZakresRead.Checked = Convert.ToBoolean(IniConfig.ReadIni("FormMain", "checkBoxZakresRead"));
+            checkBoxZakresZglWrite.Checked = Convert.ToBoolean(IniConfig.ReadIni("FormMain", "checkBoxZakresZglWrite"));
+            checkBoxZakresOprWrite.Checked = Convert.ToBoolean(IniConfig.ReadIni("FormMain", "checkBoxZakresOprWrite"));
+            checkBoxBezObreb.Checked = Convert.ToBoolean(IniConfig.ReadIni("FormMain", "checkBoxBezObreb"));
 
             toolStripStatusLabel.Text = @"Gotowy";
         }
@@ -101,7 +108,9 @@ namespace EwidOperaty
             IniConfig.SaveIni("FormMain", "X", Location.X.ToString());
             IniConfig.SaveIni("FormMain", "Y", Location.Y.ToString());
 
-            IniConfig.SaveIni("FormMain", "checkBoxZakres", checkBoxZakres.Checked.ToString());
+            IniConfig.SaveIni("FormMain", "checkBoxZakresRead", checkBoxZakresRead.Checked.ToString());
+            IniConfig.SaveIni("FormMain", "checkBoxZakresZglWrite", checkBoxZakresZglWrite.Checked.ToString());
+            IniConfig.SaveIni("FormMain", "checkBoxZakresOprWrite", checkBoxZakresOprWrite.Checked.ToString());
             IniConfig.SaveIni("FormMain", "checkBoxBezObreb", checkBoxBezObreb.Checked.ToString());
         }
 
@@ -210,7 +219,7 @@ namespace EwidOperaty
 
             DbDictionary.PzgMaterialZasobu = new PzgMaterialZasobuDict();
 
-            if (GlobalValues.OperatyBezObrebChecked)
+            if (GlobalValues.IsOperatyWithoutObrebRead)
             {
                 toolStripStatusLabel.Text = @"Ładowanie zgłoszeń bez obrębów...";
 
@@ -275,9 +284,12 @@ namespace EwidOperaty
 
         private void ButtonSaveData_Click(object sender, EventArgs e)
         {
+            string defaulFileName = checkedListBoxObreby.CheckedItems.Count == 1 ? checkedListBoxObreby.CheckedItems[0] + ".xlsm" : "wynik.xlsm";
+
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Filter = @"Excel files (*.xlsm)|*.xlsm"
+                Filter = @"Excel files (*.xlsm)|*.xlsm",
+                FileName = defaulFileName
             };
 
             if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -317,20 +329,19 @@ namespace EwidOperaty
         {
             FileInfo xlsFile = (FileInfo)e.Argument;
 
-            int operationsCountTotal = 21;
+            const int operationsCountTotal = 21;
 
             int operationCount = 0;
 
-            toolStripStatusLabel.Text = @"Zapisywanie zakresów dla zgłoszeń...";
-
-            // Zapisywanie zakresów dla zgłoszeń
-            using (StreamWriter csv = new StreamWriter(File.Open(Path.Combine(xlsFile.DirectoryName ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(xlsFile.Name) + "_zgloszenia.csv"), FileMode.Create), Encoding.UTF8))
+            if (IsZakresyZglWrite) // Zapisywanie zakresów dla zgłoszeń
             {
-                csv.WriteLine("kerg_id,pzg_idZgloszenia,obreb,pzg_polozenieObszaru");
-
-                foreach (PzgZgloszenie kerg in DbDictionary.PzgZgloszenie.Values)
+                toolStripStatusLabel.Text = "Zapisywanie zakresów dla zgłoszeń...";
+            
+                using (StreamWriter csv = new StreamWriter(File.Open(Path.Combine(xlsFile.DirectoryName ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(xlsFile.Name) + "_zgloszenia.csv"), FileMode.Create), new UTF8Encoding(false)))
                 {
-                    if (kerg.PzgPolozenieObszaru != string.Empty)
+                    csv.WriteLine("kerg_id,pzg_idZgloszenia,obreb,pzg_polozenieObszaru");
+
+                    foreach (PzgZgloszenie kerg in DbDictionary.PzgZgloszenie.Values.Where(kerg => kerg.PzgPolozenieObszaru != string.Empty))
                     {
                         csv.WriteLine(kerg.KergId + "," + kerg.PzgIdZgloszenia + "," + kerg.Obreb + ",\"" + kerg.PzgPolozenieObszaru + "\"");
 
@@ -338,35 +349,46 @@ namespace EwidOperaty
 
                         string fileName = kerg.PzgIdZgloszenia.Replace('/', '_') + ".wkt";
 
-                        DirectoryInfo zgloszeniaOutputDir = Directory.CreateDirectory(Path.Combine(xlsFile.DirectoryName, folderObrebName));
+                        DirectoryInfo outputDir = Directory.CreateDirectory(Path.Combine(xlsFile.DirectoryName, folderObrebName));
 
-                        File.WriteAllText(Path.Combine(zgloszeniaOutputDir.FullName, fileName), kerg.PzgPolozenieObszaru, Encoding.UTF8);
-
-                        kerg.PzgPolozenieObszaru = "Istnieje";
+                        File.WriteAllText(Path.Combine(outputDir.FullName, fileName), kerg.PzgPolozenieObszaru, new UTF8Encoding(false));
                     }
                 }
             }
 
-            toolStripStatusLabel.Text = @"Zapisywanie zakresów dla operatów...";
-
-            DirectoryInfo operatyDirectoryInfo = Directory.CreateDirectory(Path.Combine(xlsFile.DirectoryName ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(xlsFile.Name) + "_operaty"));
-
-            // Zapisywanie zakresów dla operatów
-            using (StreamWriter csv = new StreamWriter(File.Open(Path.Combine(xlsFile.DirectoryName ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(xlsFile.Name) + "_operaty.csv"), FileMode.Create), Encoding.UTF8))
+            if (IsZakresyOprWrite) // Zapisywanie zakresów dla operatów
             {
-                csv.WriteLine("idop,pzg_IdMaterialu,pzg_oznMaterialuZasobu,obreb,pzg_polozenieObszaru");
-
-                foreach (PzgMaterialZasobu oper in DbDictionary.PzgMaterialZasobu.Values)
+                toolStripStatusLabel.Text = "Zapisywanie zakresów dla operatów...";
+                
+                using (StreamWriter csv = new StreamWriter(File.Open(Path.Combine(xlsFile.DirectoryName ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(xlsFile.Name) + "_operaty.csv"), FileMode.Create), new UTF8Encoding(false)))
                 {
-                    if (oper.PzgPolozenieObszaru != string.Empty)
+                    csv.WriteLine("idop,pzg_IdMaterialu,pzg_oznMaterialuZasobu,obreb,pzg_polozenieObszaru");
+
+                    foreach (PzgMaterialZasobu oper in DbDictionary.PzgMaterialZasobu.Values.Where(oper => oper.PzgPolozenieObszaru != string.Empty))
                     {
                         csv.WriteLine(oper.IdOp + "," + oper.PzgIdMaterialu + "," + oper.PzgOznMaterialuZasobu + "," + oper.Obreb + ",\"" + oper.PzgPolozenieObszaru + "\"");
-                        
-                        File.WriteAllText(Path.Combine(operatyDirectoryInfo.FullName, string.IsNullOrEmpty(oper.PzgIdMaterialu) ? oper.Obreb + '_' + oper.PzgOznMaterialuZasobu.Replace('/', '_') + ".wkt" : oper.PzgIdMaterialu  + ".wkt"), oper.PzgPolozenieObszaru, Encoding.UTF8);
 
-                        oper.PzgPolozenieObszaru = "Istnieje";
+                        string folderObrebName = string.IsNullOrEmpty(oper.Obreb) ? "[brak obrębu] XXX" : DbDictionary.EgbObrebEwidencyjny.GetListIdGus(oper.Obreb);
+
+                        string fileName = string.IsNullOrEmpty(oper.PzgIdMaterialu) ? oper.Obreb + '_' + oper.PzgOznMaterialuZasobu.Replace('/', '_') + ".wkt" : oper.PzgIdMaterialu  + ".wkt";
+
+                        DirectoryInfo outputDir = Directory.CreateDirectory(Path.Combine(xlsFile.DirectoryName, folderObrebName, Path.GetFileNameWithoutExtension(fileName)));
+                        
+                        File.WriteAllText(Path.Combine(outputDir.FullName, fileName), oper.PzgPolozenieObszaru, new UTF8Encoding(false));
                     }
                 }
+            }
+
+            // przypisanie do obiektu informacji o zakresie zamiast samego zakresu
+            foreach (PzgZgloszenie kerg in DbDictionary.PzgZgloszenie.Values.Where(kerg => kerg.PzgPolozenieObszaru != string.Empty))
+            {
+                kerg.PzgPolozenieObszaru = "Istnieje";
+            }
+
+            // przypisanie do obiektu informacji o zakresie zamiast samego zakresu
+            foreach (PzgMaterialZasobu oper in DbDictionary.PzgMaterialZasobu.Values.Where(oper => oper.PzgPolozenieObszaru != string.Empty))
+            {
+                oper.PzgPolozenieObszaru = "Istnieje";
             }
 
             using (ExcelPackage xlsWorkbook = new ExcelPackage(xlsFile))
@@ -434,7 +456,7 @@ namespace EwidOperaty
                 xlsSheet = xlsWorkbook.Workbook.Worksheets.Add("SLO_OsobaUprawniona");
                 xlsSheet.Cells[1, 1].LoadFromCollection(DbDictionary.SloOsobaUprawniona.Values, PrintHeaders: true);
                 xlsSheet.Hidden = eWorkSheetHidden.Hidden;
-                xlsWorkbook.Workbook.Names.Add("SLO_OsobaUprawniona", xlsSheet.Cells["I2:I" + xlsSheet.Dimension.Rows]); //todo Dodać GmlVal do arkusza 
+                xlsWorkbook.Workbook.Names.Add("SLO_OsobaUprawniona", xlsSheet.Cells["I2:I" + xlsSheet.Dimension.Rows]); 
 
                 xlsSheet = xlsWorkbook.Workbook.Worksheets.Add("PZG_SposobPozyskania");
                 xlsSheet.Cells[1, 1].LoadFromCollection(DbDictionary.PzgSposobPozyskania.Values, PrintHeaders: true);
@@ -464,7 +486,7 @@ namespace EwidOperaty
 
                 xlsSheet.Select("B1");
 
-                _saveDataBackgroundWorker.ReportProgress((++operationCount * 100) / operationsCountTotal);
+                _saveDataBackgroundWorker.ReportProgress(++operationCount * 100 / operationsCountTotal);
 
                 foreach (ExcelWorksheet sheet in xlsWorkbook.Workbook.Worksheets)
                 {
@@ -1073,7 +1095,7 @@ namespace EwidOperaty
         {
             string folderName = e.Argument.ToString();
 
-            if (GlobalValues.OperatyBezObrebChecked)
+            if (GlobalValues.IsOperatyWithoutObrebRead)
             {
                 _oracleWorker.SaveFilesForObreb(0, folderName);
             }
@@ -1134,9 +1156,9 @@ namespace EwidOperaty
         {
             string folderName = e.Argument.ToString();
 
-            if (GlobalValues.OperatyBezObrebChecked)
+            if (GlobalValues.IsOperatyWithoutObrebRead)
             {
-                _oracleWorker.SaveWktForObreb(0, folderName);
+                _oracleWorker.SaveWktOperatForObreb(0, folderName);
             }
 
             int counter = 1;
@@ -1145,7 +1167,7 @@ namespace EwidOperaty
             {
                 toolStripStatusLabel.Text = $"Zapisywanie plików WKT dla obrębu: {obreb}";
 
-                _oracleWorker.SaveWktForObreb(DbDictionary.EgbObrebEwidencyjny.GetObrebId(obreb.ToString()), folderName);
+                _oracleWorker.SaveWktOperatForObreb(DbDictionary.EgbObrebEwidencyjny.GetObrebId(obreb.ToString()), folderName);
 
                 int percentage = (counter++ * 100) / checkedListBoxObreby.CheckedItems.Count;
                 _saveWktBackgroundWorker.ReportProgress(percentage);
@@ -1170,12 +1192,7 @@ namespace EwidOperaty
         // obsługa filtrowania obrębów na podstawie wybranych gmin
         private void CheckedListBoxGminy_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            List<string> gminaList = new List<string>();    // lista wybranych gmin
-
-            foreach (object item in checkedListBoxGminy.CheckedItems)
-            {
-                gminaList.Add(item.ToString());   // dodaj juz wybrane wcześniej gminy
-            }
+            List<string> gminaList = (from object item in checkedListBoxGminy.CheckedItems select item.ToString()).ToList();    // lista wybranych gmin
 
             if (e.NewValue == CheckState.Checked)
             {
@@ -1188,16 +1205,24 @@ namespace EwidOperaty
 
             List<string> obrebList = new List<string>();    // lista wyświetlonych obrębów
 
-            foreach (string item in gminaList)      // przeleć całą listę gmin
+            foreach (List<string> b in from item in gminaList // przeleć całą listę gmin
+                select DbDictionary.EgbGmina.GetGminaId(item) into gminaId // pobierz ID gminy z listy
+                select DbDictionary.EgbObrebEwidencyjny.Values.Where(p => p.GminaId == gminaId).ToList() into a // pobierz listę obrębów dla wybranej gminy
+                select a.Select(p => p.ListId).ToList()) // pobierz listę nazw obrębów dla wybranej gminy
             {
-                int gminaId = DbDictionary.EgbGmina.GetGminaId(item);   // pobierz ID gminy z listy
-
-                List<EgbObrebEwidencyjny> a = DbDictionary.EgbObrebEwidencyjny.Values.Where(p => p.GminaId == gminaId).ToList(); // pobierz listę obrębów dla wybranej gminy
-
-                List<string> b = a.Select(p => p.ListId).ToList();      // pobierz listę nazw obrębów dla wybranej gminy
-
                 obrebList.AddRange(b);      // dodaj do listy obrębów
             }
+
+            //foreach (string item in gminaList)      // przeleć całą listę gmin
+            //{
+            //    int gminaId = DbDictionary.EgbGmina.GetGminaId(item);   // pobierz ID gminy z listy
+
+            //    List<EgbObrebEwidencyjny> a = DbDictionary.EgbObrebEwidencyjny.Values.Where(p => p.GminaId == gminaId).ToList(); // pobierz listę obrębów dla wybranej gminy
+
+            //    List<string> b = a.Select(p => p.ListId).ToList();      // pobierz listę nazw obrębów dla wybranej gminy
+
+            //    obrebList.AddRange(b);      // dodaj do listy obrębów
+            //}
 
             checkedListBoxObreby.Items.Clear(); // wyczyść listę obrębów
 
@@ -1208,23 +1233,69 @@ namespace EwidOperaty
 
         }
 
-        private void CheckBoxZakres_CheckedChanged(object sender, EventArgs e)
+        private void FormMain_Shown(object sender, EventArgs e)
         {
-            if (sender is CheckBox checkBox)
+            MyLicense license = LicenseHandler.ReadLicenseFile(out LicenseStatus licStatus, out string validationMsg);
+
+            switch (licStatus)
             {
-                GlobalValues.ZakresyChecked = checkBox.Checked;
+                case LicenseStatus.Undefined:
+
+                    MessageBox.Show("Brak pliku z licencją!\nIdentyfikator komputera: " + LicenseHandler.GenerateUid("EwidOperaty"), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    Application.Exit();
+                    break;
+
+                case LicenseStatus.Valid:
+
+                    toolStripStatusLabel.Text = $"Licencja typu: '{license.Type}', ważna do: {license.LicenseEnd}";
+                    break;
+
+                case LicenseStatus.Invalid:
+                case LicenseStatus.Cracked:
+                case LicenseStatus.Expired:
+
+                    MessageBox.Show(validationMsg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    Application.Exit();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
-
+        
         private void CheckBoxBezObreb_CheckedChanged(object sender, EventArgs e)
         {
             if (sender is CheckBox checkBox)
             {
-                GlobalValues.OperatyBezObrebChecked = checkBox.Checked;
+                IsOperatyWithoutObrebRead = checkBox.Checked;
             }
         }
 
-        
+        private void CheckBoxZakresRead_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                IsZakresyRead = checkBox.Checked;
+            }
+        }
+
+        private void CheckBoxZakresZglWrite_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                IsZakresyZglWrite = checkBox.Checked;
+            }
+        }
+
+        private void CheckBoxZakresOprWrite_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                IsZakresyOprWrite = checkBox.Checked;
+            }
+        }
     }
 }
 

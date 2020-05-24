@@ -1,10 +1,11 @@
 ﻿using EwidOperaty.Oracle.Dictionary;
 using EwidOperaty.Tools;
-using Oracle.ManagedDataAccess.Client;
 using System;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using Oracle.ManagedDataAccess.Client;
+using static EwidOperaty.Tools.GlobalValues;
 
 namespace EwidOperaty.Oracle
 {
@@ -566,7 +567,7 @@ namespace EwidOperaty.Oracle
                     ParameterName = "obreb_id"
                 };
 
-                command.CommandText = SqlResource.GetSqlText(GlobalValues.ZakresyChecked ? "PzgZgloszenieDictZakres.sql" : "PzgZgloszenieDictBezZakres.sql");
+                command.CommandText = SqlResource.GetSqlText(IsZakresyRead ? "PzgZgloszenieDictZakres.sql" : "PzgZgloszenieDictBezZakres.sql");
 
                 command.Parameters.Clear();
                 command.Parameters.Add(obrebIdOracleParameter);
@@ -626,7 +627,7 @@ namespace EwidOperaty.Oracle
                     ParameterName = "kerg_id"
                 };
 
-                command.CommandText = SqlResource.GetSqlText(GlobalValues.ZakresyChecked ? "PzgZgloszenieZakres.sql" : "PzgZgloszenieBezZakres.sql");
+                command.CommandText = SqlResource.GetSqlText(IsZakresyRead ? "PzgZgloszenieZakres.sql" : "PzgZgloszenieBezZakres.sql");
 
                 command.Parameters.Clear();
                 command.Parameters.Add(obrebIdOracleParameter);
@@ -684,7 +685,7 @@ namespace EwidOperaty.Oracle
                     ParameterName = "obreb_id"
                 };
 
-                command.CommandText = SqlResource.GetSqlText(GlobalValues.ZakresyChecked ? "PzgMaterialZasobuDictZakres.sql" : "PzgMaterialZasobuDictBezZakres.sql");
+                command.CommandText = SqlResource.GetSqlText(IsZakresyRead ? "PzgMaterialZasobuDictZakres.sql" : "PzgMaterialZasobuDictBezZakres.sql");
 
                 command.Parameters.Clear();
                 command.Parameters.Add(obrebIdOracleParameter);
@@ -782,6 +783,7 @@ namespace EwidOperaty.Oracle
                             string typPliku = reader.GetString("typ_pliku");
                             byte[] blobData = (byte[])reader["data"];
                             DateTime dataD = (DateTime)reader["data_d"];
+                            string wl = reader.GetString("wl");
 
                             string outDirectory = DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) != string.Empty ?
                                 DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) : DbDictionary.PzgMaterialZasobu.GetOznMaterialuZasobu(idOp).Replace('/', '_');
@@ -796,7 +798,7 @@ namespace EwidOperaty.Oracle
                             string fileName = Path.GetFileNameWithoutExtension(typPliku);
                             string ext = Path.GetExtension(typPliku);
 
-                            typPliku = fileName + " [" + prefix + "]" + ext;
+                            typPliku = fileName + " [" + prefix + "]_[" + wl + "]" + ext;
 
                             string fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, typPliku);
 
@@ -804,7 +806,7 @@ namespace EwidOperaty.Oracle
 
                             while (File.Exists(fileNameAndPath))
                             {
-                                typPliku = fileName + " [" + prefix + "]" + "_" + $"{counter++:000}" + ext;
+                                typPliku = fileName + " [" + prefix + "]_[" + wl + "]_" + $"{counter++:000}" + ext;
                                 fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, typPliku);
                             }
 
@@ -826,7 +828,7 @@ namespace EwidOperaty.Oracle
             }
         }
 
-        public void SaveWktForObreb(int obrebId, string dirName)
+        public void SaveWktOperatForObreb(int obrebId, string dirName)
         {
             string obrebListId = obrebId == 0 ? "[brak obrębu] XXX" : DbDictionary.EgbObrebEwidencyjny.GetListId(obrebId);
 
@@ -854,30 +856,33 @@ namespace EwidOperaty.Oracle
                             string geom = reader.GetString("geom");
                             DateTime dataD = (DateTime)reader["data_d"];
 
-                            string outDirectory = DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) != string.Empty ?
-                                DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) : DbDictionary.PzgMaterialZasobu.GetOznMaterialuZasobu(idOp).Replace('/', '_');
-
-                            if (!Directory.Exists(Path.Combine(dirName, obrebListId, outDirectory)))
+                            if (!string.IsNullOrEmpty(geom))
                             {
-                                Directory.CreateDirectory(Path.Combine(dirName, obrebListId, outDirectory));
+                                string idMaterialu = DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) != string.Empty ?
+                                    DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) : DbDictionary.PzgMaterialZasobu.GetOznMaterialuZasobu(idOp).Replace('/', '_');
+
+                                if (!Directory.Exists(Path.Combine(dirName, obrebListId, idMaterialu)))
+                                {
+                                    Directory.CreateDirectory(Path.Combine(dirName, obrebListId, idMaterialu));
+                                }
+
+                                string fileName = idMaterialu + "-" + Path.GetFileNameWithoutExtension(typPliku);
+                                const string ext = ".wkt";
+
+                                string fileNameAndPath = Path.Combine(dirName, obrebListId, idMaterialu, fileName + ext);
+
+                                int counter = 2;
+
+                                while (File.Exists(fileNameAndPath))
+                                {
+                                    fileNameAndPath = Path.Combine(dirName, obrebListId, idMaterialu, fileName + "@" + $"{counter++:000}" + ext);
+                                }
+
+                                File.WriteAllText(fileNameAndPath, geom, new UTF8Encoding(false));
+
+                                File.SetLastWriteTime(fileNameAndPath, dataD);
+                                File.SetCreationTime(fileNameAndPath, dataD);
                             }
-
-                            string fileName = Path.GetFileNameWithoutExtension(typPliku);
-                            const string ext = ".wkt";
-
-                            string fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, fileName + ext);
-
-                            int counter = 2;
-
-                            while (File.Exists(fileNameAndPath))
-                            {
-                                fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, fileName + "_" + $"{counter++:000}" + ext);
-                            }
-
-                            File.WriteAllText(fileNameAndPath, geom, Encoding.UTF8);
-
-                            File.SetLastWriteTime(fileNameAndPath, dataD);
-                            File.SetCreationTime(fileNameAndPath, dataD);
                         }
                     }
                 }
