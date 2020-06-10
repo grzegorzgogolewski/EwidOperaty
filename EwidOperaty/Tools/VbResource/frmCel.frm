@@ -13,15 +13,10 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
 Option Explicit
 
 Private Sub UserForm_Activate()
 
-    Application.EnableEvents = False
-    
-    Worksheets("PZG_MaterialZasobu").Cells(g_celRow, g_celColumn).Select
-    
     ' ---------------------------------------------------------------------------------------------
     ' Dodanie waartosci do s³ownika
     ' ---------------------------------------------------------------------------------------------
@@ -87,27 +82,21 @@ Private Sub UserForm_Activate()
     End If
     
     ListBoxCel.SetFocus
-    
-    Application.EnableEvents = True
 
 End Sub
 
 Private Sub CommandButtoAnuluj_Click()
-
-    Application.EnableEvents = False
-
+   
     Worksheets("PZG_MaterialZasobu").Cells(g_celRow, g_celColumn) = g_celOld
-
+    
     frmCel.Hide
-
-    Application.EnableEvents = True
+    
+    Worksheets("PZG_MaterialZasobu").Cells(g_celRow, g_celColumn).Select
 
 End Sub
 
 Private Sub CommandButtonWybierz_Click()
 
-    Application.EnableEvents = False
-    
     Dim licznikLista As Integer
     Dim noweWartosci As String
     
@@ -126,12 +115,11 @@ Private Sub CommandButtonWybierz_Click()
     If noweWartosci <> "" Then noweWartosci = Left(noweWartosci, Len(noweWartosci) - 1)
     
     Worksheets("PZG_MaterialZasobu").Cells(g_celRow, g_celColumn) = noweWartosci
-
+    
     g_celOld = noweWartosci
 
     frmCel.Hide
     
-    Application.EnableEvents = True
+    Worksheets("PZG_MaterialZasobu").Cells(g_celRow, g_celColumn).Select
 
 End Sub
-

@@ -21,7 +21,8 @@ WHERE
     AND kd.data_k IS NULL
     AND NVL(op.obreb_id, 0) = :obreb_id
 	--and op.idop IN (select idop  from gg_operaty)
-	--and kd.data_d >= TO_DATE('10-07-2019 09:02:14','DD-MM-YYYY hh24:mi:ss')
+    --AND op.idop IN (select idop from osr_operat WHERE rok_zgl >= 2019 OR IDMAT_ROK >= 2019)
+	--and kd.data_d >= TO_DATE('26-09-2019 00:00:00','DD-MM-YYYY hh24:mi:ss')
 UNION ALL
 SELECT 
     kd.id_dok,
@@ -47,4 +48,5 @@ WHERE
     AND kd.data_k IS NULL
 	AND NVL(op.obreb_id, 0) = :obreb_id
 	--and op.idop IN (select idop  from gg_operaty)
-	--and kd.data_d >= TO_DATE('10-07-2019 09:02:14','DD-MM-YYYY hh24:mi:ss')
+    --AND op.idop IN (select idop from osr_operat WHERE rok_zgl >= 2019 OR IDMAT_ROK >= 2019)
+	--and kd.data_d >= TO_DATE('26-09-2019 00:00:00','DD-MM-YYYY hh24:mi:ss')

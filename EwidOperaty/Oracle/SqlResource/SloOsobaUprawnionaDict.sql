@@ -3,6 +3,7 @@
 FROM 
     uprawnieni upr, slo_ulice u, slo_miejsc m
 WHERE
-    upr.ulica_id = u.ulica_id(+)
+    upr.osoba_id IN (SELECT upraw_id from osr_kerg_upraw)
+    AND upr.ulica_id = u.ulica_id(+)
     AND u.miejsc_id = m.miejsc_id (+)
 ORDER BY upr.imie, upr.nazwisko

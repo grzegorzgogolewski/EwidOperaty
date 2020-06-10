@@ -2,7 +2,11 @@
 
 Global g_tworcaColumn As Integer
 Global g_tworcaRow As Integer
+Global g_tworcaOldId As String
 Global g_tworcaOld As String
+Global g_tworcaOldRegon As String
+Global g_tworcaOldPesel As String
+
 Global g_tworcaFound As Boolean
 Global g_TworcaDic() As String
 
@@ -26,11 +30,6 @@ Sub ImportForms()
     Application.VBE.ActiveVBProject.VBComponents.Import ActiveWorkbook.Path & "\" & "frmCelArchiwalny.frm"
     Application.VBE.ActiveVBProject.VBComponents.Import ActiveWorkbook.Path & "\" & "frmUprawniony.frm"
 
-End Sub
-
-
-Sub WlaczZdarzenia()
-    Application.EnableEvents = True
 End Sub
 
 Function CheckDzialka(dzialka As String) As Integer
@@ -116,9 +115,9 @@ Sub DzialkiPrzedPo()
     While PZG_MaterialZasobu.Cells(licznikWierszy, "A") <> ""
 
         idMaterialu = PZG_MaterialZasobu.Cells(licznikWierszy, "B")
-        operat = PZG_MaterialZasobu.Cells(licznikWierszy, "T")
+        operat = PZG_MaterialZasobu.Cells(licznikWierszy, "U")
         
-        dzialkaPrzed = PZG_MaterialZasobu.Cells(licznikWierszy, "AG")
+        dzialkaPrzed = PZG_MaterialZasobu.Cells(licznikWierszy, "AH")
         dzialkaPrzedSplit = Split(dzialkaPrzed, ";")
 
         If dzialkaPrzed <> "" Then
@@ -135,7 +134,7 @@ Sub DzialkiPrzedPo()
 
         End If
         
-        dzialkaPo = PZG_MaterialZasobu.Cells(licznikWierszy, "AH")
+        dzialkaPo = PZG_MaterialZasobu.Cells(licznikWierszy, "AI")
         dzialkaPoSplit = Split(dzialkaPo, ";")
 
         If dzialkaPo <> "" Then

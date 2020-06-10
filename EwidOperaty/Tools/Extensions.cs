@@ -55,6 +55,8 @@ namespace EwidOperaty.Tools
                 {
                     switch (attrName)
                     {
+                        case "osoba_id":
+                            return DbDictionary.PzgPodmiotZglaszajacy[reader.GetIntId("pzg_podmiotZglaszajacy")].OsobaId.ToString();
                         case "regon":
                             return DbDictionary.PzgPodmiotZglaszajacy[reader.GetIntId("pzg_podmiotZglaszajacy")].Regon;
                         case "pesel":
@@ -177,6 +179,8 @@ namespace EwidOperaty.Tools
                 {
                     switch (attrName)
                     {
+                        case "osoba_id":
+                            return DbDictionary.PzgPodmiotZglaszajacy[reader.GetIntId("pzg_tworca_id")].OsobaId.ToString();
                         case "regon":
                             return DbDictionary.PzgPodmiotZglaszajacy[reader.GetIntId("pzg_tworca_id")].Regon;
                         case "pesel":

@@ -13,76 +13,13 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
 Option Explicit
-
-Private Sub CommandButtoAnuluj_Click()
-
-    Application.EnableEvents = False
-
-    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = g_tworcaOld
-
-    frmTworca.Hide
-
-    Application.EnableEvents = True
-
-End Sub
-
-Private Sub CommandButtonWybierz_Click()
-
-    Application.EnableEvents = False
-    
-    If ListBoxTworca.ListCount = 0 Then
-        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = g_tworcaOld
-        Application.EnableEvents = True
-        Exit Sub
-    End If
-
-    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn).Select
-    
-    If ListBoxTworca.ListIndex >= 0 Then
-    
-        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = ListBoxTworca.List(ListBoxTworca.ListIndex, 1)        ' NAZWA
-        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 1) = ListBoxTworca.List(ListBoxTworca.ListIndex, 2)    ' REGON
-        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 2) = ListBoxTworca.List(ListBoxTworca.ListIndex, 3)    ' PESEL
-    
-    Else
-    
-        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = ""        ' NAZWA
-        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 1) = ""    ' REGON
-        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 2) = ""    ' PESEL
-        
-    End If
-    
-    frmTworca.Hide
-    
-    Application.EnableEvents = True
-    
-End Sub
-
-Private Sub CommandButtoUsun_Click()
-    
-    Application.EnableEvents = False
-
-    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = ""
-    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 1) = ""
-    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 2) = ""
-
-    frmTworca.Hide
-
-    Application.EnableEvents = True
-    
-End Sub
 
 Private Sub UserForm_Activate()
 
-    Application.EnableEvents = False
-    
     ListBoxTworca.ColumnWidths = "60;500;50;50;30;50"
     ListBoxTworca.ColumnCount = 6
     
-    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn).Select
-
     Dim tworcaSearch As String
     
     ' ---------------------------------------------------------------------------------------------
@@ -143,7 +80,53 @@ Private Sub UserForm_Activate()
     
     ListBoxTworca.SetFocus
     
-    Application.EnableEvents = True
+End Sub
+
+Private Sub CommandButtonWybierz_Click()
+
+    If ListBoxTworca.ListCount = 0 Then
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = g_tworcaOld
+        Exit Sub
+    End If
+    
+    If ListBoxTworca.ListIndex >= 0 Then
+    
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn - 1) = ListBoxTworca.List(ListBoxTworca.ListIndex, 0)    ' OSOBA_ID
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = ListBoxTworca.List(ListBoxTworca.ListIndex, 1)        ' NAZWA
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 1) = ListBoxTworca.List(ListBoxTworca.ListIndex, 2)    ' REGON
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 2) = ListBoxTworca.List(ListBoxTworca.ListIndex, 3)    ' PESEL
+    
+    Else
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn - 1) = ""    ' OSOBA_ID
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = ""        ' NAZWA
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 1) = ""    ' REGON
+        Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 2) = ""    ' PESEL
+        
+    End If
+    
+    frmTworca.Hide
+    
+    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn).Select
     
 End Sub
 
+Private Sub CommandButtoAnuluj_Click()
+
+    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = g_tworcaOld
+
+    frmTworca.Hide
+    
+    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn).Select
+
+End Sub
+
+Private Sub CommandButtoUsun_Click()
+    
+    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn - 1) = ""
+    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn) = ""
+    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 1) = ""
+    Worksheets("PZG_MaterialZasobu").Cells(g_tworcaRow, g_tworcaColumn + 2) = ""
+
+    frmTworca.Hide
+    
+End Sub

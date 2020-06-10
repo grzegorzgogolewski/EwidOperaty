@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmUprawniony 
    Caption         =   "Uprawniony"
-   ClientHeight    =   9195
+   ClientHeight    =   9195.001
    ClientLeft      =   45
    ClientTop       =   390
    ClientWidth     =   13110
@@ -17,10 +17,6 @@ Option Explicit
 
 Private Sub UserForm_Activate()
 
-    Application.EnableEvents = False
-    
-    Worksheets("PZG_MaterialZasobu").Cells(g_uprawnionyRow, g_uprawnionyColumn).Select
-    
     ' ---------------------------------------------------------------------------------------------
     ' Dodanie wartosci do s³ownika
     ' ---------------------------------------------------------------------------------------------
@@ -93,27 +89,21 @@ Private Sub UserForm_Activate()
     End If
     
     ListBoxUprawniony.SetFocus
-    
-    Application.EnableEvents = True
 
 End Sub
 
 Private Sub CommandButtoAnuluj_Click()
 
-    Application.EnableEvents = False
-
     Worksheets("PZG_MaterialZasobu").Cells(g_uprawnionyRow, g_uprawnionyColumn) = g_uprawnionyOld
 
     frmUprawniony.Hide
-
-    Application.EnableEvents = True
+    
+    Worksheets("PZG_MaterialZasobu").Cells(g_uprawnionyRow, g_uprawnionyColumn).Select
 
 End Sub
 
 Private Sub CommandButtonWybierz_Click()
 
-    Application.EnableEvents = False
-    
     Dim licznikLista As Integer
     Dim noweWartosci As String
     
@@ -137,7 +127,6 @@ Private Sub CommandButtonWybierz_Click()
 
     frmUprawniony.Hide
     
-    Application.EnableEvents = True
+    Worksheets("PZG_MaterialZasobu").Cells(g_uprawnionyRow, g_uprawnionyColumn).Select
 
 End Sub
-

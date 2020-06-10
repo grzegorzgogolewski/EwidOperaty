@@ -573,47 +573,48 @@ namespace EwidOperaty.Oracle
                 command.Parameters.Add(obrebIdOracleParameter);
                 obrebIdOracleParameter.Value = obrebId;
 
+                PzgZgloszenieDict zgloszenieDict = new PzgZgloszenieDict();
+
                 try
                 {
                     using (OracleDataReader reader = command.ExecuteReader())
                     {
-                        PzgZgloszenieDict zgloszenieDict = new PzgZgloszenieDict();
-
                         while (reader.Read())
                         {
-                            PzgZgloszenie zgloszenie = new PzgZgloszenie
-                            {
-                                KergId = reader.GetIntId("kerg_id"),
-                                PzgIdZgloszenia = reader.GetString("pzg_idZgloszenia"),
-                                PzgDataZgloszenia = reader.GetDate("pzg_dataZgloszenia"),
-                                IdZgloszeniaJedn = reader.GetString("idZgloszeniaJedn"),
-                                IdZgloszeniaNr = reader.GetIntId("idZgloszeniaNr"),
-                                IdZgloszeniaRok = reader.GetIntId("idZgloszeniaRok"),
-                                IdZgloszeniaEtap = reader.GetInt32("idZgloszeniaEtap"),
-                                IdZgloszeniaSepJednNr = reader.GetString("idZgloszeniaSepJednNr"),
-                                IdZgloszeniaSepNrRok = reader.GetString("idZgloszeniaSepNrRok"),
-                                PzgPolozenieObszaru = reader.GetString("pzg_polozenieObszaru"),
-                                Obreb = reader.GetPzgZgloszenieAttr("obreb", string.Empty),
-                                PzgPodmiotZglaszajacyNazwa = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", string.Empty),
-                                PzgPodmiotZglaszajacyRegon = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "regon"),
-                                PzgPodmiotZglaszajacyPesel = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "pesel"),
-                                PzgCel = reader.GetPzgZgloszenieAttr("pzg_cel", "pzg_cel"),
-                                CelArchiwalny = reader.GetPzgZgloszenieAttr("pzg_cel", "cel_archiwalny"),
-                                PzgRodzaj = reader.GetPzgZgloszenieAttr("pzg_rodzaj", string.Empty),
-                                OsobaUprawniona = reader.GetPzgZgloszenieAttr("osobaUprawniona", string.Empty)
-                            };
+                            PzgZgloszenie zgloszenie = new PzgZgloszenie();
+
+                            zgloszenie.KergId = reader.GetIntId("kerg_id");
+                            zgloszenie.PzgIdZgloszenia = reader.GetString("pzg_idZgloszenia");
+                            zgloszenie.PzgDataZgloszenia = reader.GetDate("pzg_dataZgloszenia");
+                            zgloszenie.IdZgloszeniaJedn = reader.GetString("idZgloszeniaJedn");
+                            zgloszenie.IdZgloszeniaNr = reader.GetIntId("idZgloszeniaNr");
+                            zgloszenie.IdZgloszeniaRok = reader.GetIntId("idZgloszeniaRok");
+                            zgloszenie.IdZgloszeniaEtap = reader.GetInt32("idZgloszeniaEtap");
+                            zgloszenie.IdZgloszeniaSepJednNr = reader.GetString("idZgloszeniaSepJednNr");
+                            zgloszenie.IdZgloszeniaSepNrRok = reader.GetString("idZgloszeniaSepNrRok");
+                            zgloszenie.PzgPolozenieObszaru = reader.GetString("pzg_polozenieObszaru");
+                            zgloszenie.Obreb = reader.GetPzgZgloszenieAttr("obreb", string.Empty);
+                            zgloszenie.PzgPodmiotZglaszajacyOsobaId = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "osoba_id");
+                            zgloszenie.PzgPodmiotZglaszajacyNazwa = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", string.Empty);
+                            zgloszenie.PzgPodmiotZglaszajacyRegon = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "regon");
+                            zgloszenie.PzgPodmiotZglaszajacyPesel = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "pesel");
+                            zgloszenie.PzgCel = reader.GetPzgZgloszenieAttr("pzg_cel", "pzg_cel");
+                            zgloszenie.CelArchiwalny = reader.GetPzgZgloszenieAttr("pzg_cel", "cel_archiwalny");
+                            zgloszenie.PzgRodzaj = reader.GetPzgZgloszenieAttr("pzg_rodzaj", string.Empty);
+                            zgloszenie.OsobaUprawniona = reader.GetPzgZgloszenieAttr("osobaUprawniona", string.Empty);
 
                             zgloszenieDict.Add(zgloszenie.KergId, zgloszenie);
                         }
 
-                        return zgloszenieDict;
+                        
                     }
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show($@"{e.Message}\n\n{e.Source}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return new PzgZgloszenieDict();
+                    MessageBox.Show($"{e.Message}\n\n{e.Source}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+
+                return zgloszenieDict;
             }
         }
 
@@ -633,6 +634,8 @@ namespace EwidOperaty.Oracle
                 command.Parameters.Add(obrebIdOracleParameter);
                 obrebIdOracleParameter.Value = kergId;
 
+                PzgZgloszenie zgloszenie = new PzgZgloszenie();
+
                 try
                 {
                     using (OracleDataReader reader = command.ExecuteReader())
@@ -641,37 +644,51 @@ namespace EwidOperaty.Oracle
 
                         reader.Read();
 
-                        PzgZgloszenie zgloszenie = new PzgZgloszenie
-                        {
-                            KergId = reader.GetIntId("kerg_id"),
-                            PzgIdZgloszenia = reader.GetString("pzg_idZgloszenia"),
-                            PzgDataZgloszenia = reader.GetDate("pzg_dataZgloszenia"),
-                            IdZgloszeniaJedn = reader.GetString("idZgloszeniaJedn"),
-                            IdZgloszeniaNr = reader.GetIntId("idZgloszeniaNr"),
-                            IdZgloszeniaRok = reader.GetIntId("idZgloszeniaRok"),
-                            IdZgloszeniaEtap = reader.GetInt32("idZgloszeniaEtap"),
-                            IdZgloszeniaSepJednNr = reader.GetString("idZgloszeniaSepJednNr"),
-                            IdZgloszeniaSepNrRok = reader.GetString("idZgloszeniaSepNrRok"),
-                            PzgPolozenieObszaru = reader.GetString("pzg_polozenieObszaru"),
-                            Obreb = reader.GetPzgZgloszenieAttr("obreb", string.Empty),
-                            PzgPodmiotZglaszajacyNazwa = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", string.Empty),
-                            PzgPodmiotZglaszajacyRegon = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "regon"),
-                            PzgPodmiotZglaszajacyPesel = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "pesel"),
-                            PzgCel = reader.GetPzgZgloszenieAttr("pzg_cel", "pzg_cel"),
-                            CelArchiwalny = reader.GetPzgZgloszenieAttr("pzg_cel", "cel_archiwalny"),
-                            PzgRodzaj = reader.GetPzgZgloszenieAttr("pzg_rodzaj", string.Empty),
-                            OsobaUprawniona = reader.GetPzgZgloszenieAttr("osobaUprawniona", string.Empty)
-                        };
-
-                        return zgloszenie;
-
+                        zgloszenie.KergId = reader.GetIntId("kerg_id");
+                        zgloszenie.PzgIdZgloszenia = reader.GetString("pzg_idZgloszenia");
+                        zgloszenie.PzgDataZgloszenia = reader.GetDate("pzg_dataZgloszenia");
+                        zgloszenie.IdZgloszeniaJedn = reader.GetString("idZgloszeniaJedn");
+                        zgloszenie.IdZgloszeniaNr = reader.GetIntId("idZgloszeniaNr");
+                        zgloszenie.IdZgloszeniaRok = reader.GetIntId("idZgloszeniaRok");
+                        zgloszenie.IdZgloszeniaEtap = reader.GetInt32("idZgloszeniaEtap");
+                        zgloszenie.IdZgloszeniaSepJednNr = reader.GetString("idZgloszeniaSepJednNr");
+                        zgloszenie.IdZgloszeniaSepNrRok = reader.GetString("idZgloszeniaSepNrRok");
+                        zgloszenie.PzgPolozenieObszaru = reader.GetString("pzg_polozenieObszaru");
+                        zgloszenie.Obreb = reader.GetPzgZgloszenieAttr("obreb", string.Empty);
+                        zgloszenie.PzgPodmiotZglaszajacyOsobaId = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "osoba_id");
+                        zgloszenie.PzgPodmiotZglaszajacyNazwa = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", string.Empty);
+                        zgloszenie.PzgPodmiotZglaszajacyRegon = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "regon");
+                        zgloszenie.PzgPodmiotZglaszajacyPesel = reader.GetPzgZgloszenieAttr("pzg_podmiotZglaszajacy", "pesel");
+                        zgloszenie.PzgCel = reader.GetPzgZgloszenieAttr("pzg_cel", "pzg_cel");
+                        zgloszenie.CelArchiwalny = reader.GetPzgZgloszenieAttr("pzg_cel", "cel_archiwalny");
+                        zgloszenie.PzgRodzaj = reader.GetPzgZgloszenieAttr("pzg_rodzaj", string.Empty);
+                        zgloszenie.OsobaUprawniona = reader.GetPzgZgloszenieAttr("osobaUprawniona", string.Empty);
                     }
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show($@"{e.Message}\n\n{e.Source}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return new PzgZgloszenie();
+                    MessageBox.Show($"KERG_ID: {zgloszenie.KergId}\n" +
+                                    $"pzg_idZgloszenia: {zgloszenie.PzgIdZgloszenia}\n" +
+                                    $"PzgDataZgloszenia: {zgloszenie.PzgDataZgloszenia}\n" +
+                                    $"IdZgloszeniaJedn: {zgloszenie.IdZgloszeniaJedn}\n" +
+                                    $"IdZgloszeniaNr: {zgloszenie.IdZgloszeniaNr}\n" +
+                                    $"IdZgloszeniaRok: {zgloszenie.IdZgloszeniaRok}\n" +
+                                    $"IdZgloszeniaEtap: {zgloszenie.IdZgloszeniaEtap}\n" +
+                                    $"IdZgloszeniaSepJednNr: {zgloszenie.IdZgloszeniaSepJednNr}\n" +
+                                    $"IdZgloszeniaSepNrRok: {zgloszenie.IdZgloszeniaSepNrRok}\n" +
+                                    //$"PzgPolozenieObszaru: {zgloszenie.PzgPolozenieObszaru}\n" +
+                                    $"Obreb: {zgloszenie.Obreb}\n" +
+                                    $"PzgPodmiotZglaszajacyNazwa: {zgloszenie.PzgPodmiotZglaszajacyNazwa}\n" +
+                                    $"PzgPodmiotZglaszajacyRegon: {zgloszenie.PzgPodmiotZglaszajacyRegon}\n" +
+                                    $"PzgPodmiotZglaszajacyPesel: {zgloszenie.PzgPodmiotZglaszajacyPesel}\n" +
+                                    $"PzgCel: {zgloszenie.PzgCel}\n" +
+                                    $"CelArchiwalny: {zgloszenie.CelArchiwalny}\n" +
+                                    $"PzgRodzaj: {zgloszenie.PzgRodzaj}\n" +
+                                    $"OsobaUprawniona: {zgloszenie.OsobaUprawniona}\n" +
+                                    $"\n{e.Message}\n{e.Source}", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+
+                return zgloszenie;
             }
         }
 
@@ -708,6 +725,7 @@ namespace EwidOperaty.Oracle
                                 PzgNazwa = reader.GetPzgMaterialZasobuAttr("pzg_nazwa", string.Empty),
                                 PzgPolozenieObszaru = reader.GetString("pzg_polozenieObszaru"),
                                 Obreb = reader.GetPzgMaterialZasobuAttr("obreb", string.Empty),
+                                PzgTworcaOsobaId = reader.GetPzgMaterialZasobuAttr("pzg_tworca_id", "osoba_id"),
                                 PzgTworcaNazwa = reader.GetPzgMaterialZasobuAttr("pzg_tworca_id", string.Empty),
                                 PzgTworcaRegon = reader.GetPzgMaterialZasobuAttr("pzg_tworca_id", "regon"),
                                 PzgTworcaPesel = reader.GetPzgMaterialZasobuAttr("pzg_tworca_id", "pesel"),
@@ -799,6 +817,7 @@ namespace EwidOperaty.Oracle
                             string ext = Path.GetExtension(typPliku);
 
                             typPliku = fileName + " [" + prefix + "]_[" + wl + "]" + ext;
+                            //typPliku = fileName + ext;
 
                             string fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, typPliku);
 
@@ -807,6 +826,7 @@ namespace EwidOperaty.Oracle
                             while (File.Exists(fileNameAndPath))
                             {
                                 typPliku = fileName + " [" + prefix + "]_[" + wl + "]_" + $"{counter++:000}" + ext;
+                                //typPliku = fileName + "_" + $"{counter++:000}" + ext;
                                 fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, typPliku);
                             }
 
@@ -852,30 +872,37 @@ namespace EwidOperaty.Oracle
                         while (reader.Read())
                         {
                             int idOp = reader.GetIntId("idop");
+                            int idRodzDok = reader.GetIntId("id_rodz_dok");
                             string typPliku = reader.GetString("typ_pliku");
                             string geom = reader.GetString("geom");
                             DateTime dataD = (DateTime)reader["data_d"];
+                            string wl = reader.GetString("wl");
 
                             if (!string.IsNullOrEmpty(geom))
                             {
-                                string idMaterialu = DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) != string.Empty ?
+                                string outDirectory = DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) != string.Empty ?
                                     DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) : DbDictionary.PzgMaterialZasobu.GetOznMaterialuZasobu(idOp).Replace('/', '_');
 
-                                if (!Directory.Exists(Path.Combine(dirName, obrebListId, idMaterialu)))
+                                if (!Directory.Exists(Path.Combine(dirName, obrebListId, outDirectory)))
                                 {
-                                    Directory.CreateDirectory(Path.Combine(dirName, obrebListId, idMaterialu));
+                                    Directory.CreateDirectory(Path.Combine(dirName, obrebListId, outDirectory));
                                 }
 
-                                string fileName = idMaterialu + "-" + Path.GetFileNameWithoutExtension(typPliku);
+                                string prefix = DbDictionary.SloSzczRodzDok.GetPrefix(idRodzDok);
+
+                                string fileName = Path.GetFileNameWithoutExtension(typPliku);
                                 const string ext = ".wkt";
 
-                                string fileNameAndPath = Path.Combine(dirName, obrebListId, idMaterialu, fileName + ext);
+                                typPliku = fileName + " [" + prefix + "]_[" + wl + "]" + ext;   
 
-                                int counter = 2;
+                                string fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, typPliku);
+
+                                int counter = 1;
 
                                 while (File.Exists(fileNameAndPath))
                                 {
-                                    fileNameAndPath = Path.Combine(dirName, obrebListId, idMaterialu, fileName + "@" + $"{counter++:000}" + ext);
+                                    typPliku = fileName + " [" + prefix + "]_[" + wl + "]_" + $"{counter++:000}" + ext;
+                                    fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, typPliku);
                                 }
 
                                 File.WriteAllText(fileNameAndPath, geom, new UTF8Encoding(false));

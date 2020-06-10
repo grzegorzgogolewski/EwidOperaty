@@ -12,11 +12,12 @@ namespace EwidOperaty.Oracle.Dictionary
         public string IdZgloszeniaJedn { get; set; }                //  CharacterString
         public int IdZgloszeniaNr { get; set; }                     //  Integer
         public int? IdZgloszeniaRok { get; set; }                   //  Integer
-        public int? IdZgloszeniaEtap { get; set; }                  // Integer
+        public int? IdZgloszeniaEtap { get; set; }                  //  Integer
         public string IdZgloszeniaSepJednNr { get; set; }           //  CharacterString
         public string IdZgloszeniaSepNrRok { get; set; }            //  CharacterString
         public string PzgPolozenieObszaru { get; set; }             //  PZG_Polozenie
         public string Obreb { get; set; }                           //  CharacterString
+        public string PzgPodmiotZglaszajacyOsobaId { get; set; }    //  PZG_PodmiotZglaszajacy
         public string PzgPodmiotZglaszajacyNazwa { get; set; }      //  PZG_PodmiotZglaszajacy
         public string PzgPodmiotZglaszajacyRegon { get; set; }      //  PZG_PodmiotZglaszajacy
         public string PzgPodmiotZglaszajacyPesel { get; set; }      //  PZG_PodmiotZglaszajacy

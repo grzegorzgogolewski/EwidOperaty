@@ -4,5 +4,5 @@ FROM
     ewid4.obreb o, ewid4.gmina g
 WHERE 
     o.gmina_id = g.mslink
-    AND data_arch IS NULL 
+    --AND data_arch IS NULL 
 ORDER BY o.numer_gus

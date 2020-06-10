@@ -41,4 +41,5 @@ FROM
     ewid4.osr_operat op 
 WHERE 
     NVL(op.obreb_id, 0) = :obreb_id
+    --AND op.idop IN (select idop from gg_operaty)
 ORDER BY idop

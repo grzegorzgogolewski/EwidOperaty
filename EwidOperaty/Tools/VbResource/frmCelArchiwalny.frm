@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmCelArchiwalny 
    Caption         =   "Cel archiwalny"
-   ClientHeight    =   8565
+   ClientHeight    =   8565.001
    ClientLeft      =   45
    ClientTop       =   390
    ClientWidth     =   10440
@@ -17,10 +17,6 @@ Option Explicit
 
 Private Sub UserForm_Activate()
 
-    Application.EnableEvents = False
-    
-    Worksheets("PZG_MaterialZasobu").Cells(g_celArchiwalnyRow, g_celArchiwalnyColumn).Select
-    
     ' ---------------------------------------------------------------------------------------------
     ' Dodanie waartosci do s³ownika
     ' ---------------------------------------------------------------------------------------------
@@ -86,27 +82,21 @@ Private Sub UserForm_Activate()
     End If
     
     ListBoxCel.SetFocus
-    
-    Application.EnableEvents = True
 
 End Sub
 
 Private Sub CommandButtoAnuluj_Click()
 
-    Application.EnableEvents = False
-
     Worksheets("PZG_MaterialZasobu").Cells(g_celArchiwalnyRow, g_celArchiwalnyColumn) = g_celArchiwalnyOld
 
     frmCelArchiwalny.Hide
-
-    Application.EnableEvents = True
+    
+    Worksheets("PZG_MaterialZasobu").Cells(g_celArchiwalnyRow, g_celArchiwalnyColumn).Select
 
 End Sub
 
 Private Sub CommandButtonWybierz_Click()
 
-    Application.EnableEvents = False
-    
     Dim licznikLista As Integer
     Dim noweWartosci As String
     
@@ -125,12 +115,11 @@ Private Sub CommandButtonWybierz_Click()
     If noweWartosci <> "" Then noweWartosci = Left(noweWartosci, Len(noweWartosci) - 1)
     
     Worksheets("PZG_MaterialZasobu").Cells(g_celArchiwalnyRow, g_celArchiwalnyColumn) = noweWartosci
-
+    
     g_celArchiwalnyOld = noweWartosci
 
     frmCelArchiwalny.Hide
     
-    Application.EnableEvents = True
+    Worksheets("PZG_MaterialZasobu").Cells(g_celArchiwalnyRow, g_celArchiwalnyColumn).Select
 
 End Sub
-

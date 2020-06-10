@@ -13,6 +13,7 @@ namespace EwidOperaty.Oracle.Dictionary
         public string PzgNazwa { get; set; }                    //  PZG_NazwaMat
         public string PzgPolozenieObszaru { get; set; }         //  PZG_Polozenie
         public string Obreb { get; set; }                       //  CharacterString
+        public string PzgTworcaOsobaId { get; set; }            //  PZG_PodmiotZglaszajacy
         public string PzgTworcaNazwa { get; set; }              //  PZG_PodmiotZglaszajacy
         public string PzgTworcaRegon { get; set; }              //  PZG_PodmiotZglaszajacy
         public string PzgTworcaPesel { get; set; }              //  PZG_PodmiotZglaszajacy

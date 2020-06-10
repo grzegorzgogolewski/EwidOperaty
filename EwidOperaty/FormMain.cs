@@ -219,7 +219,7 @@ namespace EwidOperaty
 
             DbDictionary.PzgMaterialZasobu = new PzgMaterialZasobuDict();
 
-            if (GlobalValues.IsOperatyWithoutObrebRead)
+            if (IsOperatyWithoutObrebRead)
             {
                 toolStripStatusLabel.Text = @"Ładowanie zgłoszeń bez obrębów...";
 
@@ -281,14 +281,14 @@ namespace EwidOperaty
 
             toolStripStatusLabel.Text = $"Pobrano {DbDictionary.PzgMaterialZasobu.Count} operatów oraz {DbDictionary.PzgZgloszenie.Count} zgłoszeń z bazy.";
         }
-
+        
         private void ButtonSaveData_Click(object sender, EventArgs e)
         {
             string defaulFileName = checkedListBoxObreby.CheckedItems.Count == 1 ? checkedListBoxObreby.CheckedItems[0] + ".xlsm" : "wynik.xlsm";
 
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Filter = @"Excel files (*.xlsm)|*.xlsm",
+                Filter = "Excel files (*.xlsm)|*.xlsm",
                 FileName = defaulFileName
             };
 
@@ -480,6 +480,7 @@ namespace EwidOperaty
 
                 xlsSheet = xlsWorkbook.Workbook.Worksheets.Add("PZG_Zgloszenie");
                 xlsSheet.Cells[1, 1].LoadFromCollection(DbDictionary.PzgZgloszenie.Values, PrintHeaders: true);
+                xlsWorkbook.Workbook.Names.Add("PZG_IdZgloszenia", xlsSheet.Cells["B2:B" + (xlsSheet.Dimension.Rows + 1000)]);
 
                 xlsSheet = xlsWorkbook.Workbook.Worksheets.Add("PZG_MaterialZasobu");
                 xlsSheet.Cells[1, 1].LoadFromCollection(DbDictionary.PzgMaterialZasobu.Values, PrintHeaders: true);
@@ -490,7 +491,7 @@ namespace EwidOperaty
 
                 foreach (ExcelWorksheet sheet in xlsWorkbook.Workbook.Worksheets)
                 {
-                    toolStripStatusLabel.Text = $@"Zapisywanie pliku {xlsFile.Name} [{sheet.Name}]";
+                    toolStripStatusLabel.Text = $"Zapisywanie pliku {xlsFile.Name} [{sheet.Name}]";
 
                     int rowsCount = sheet.Dimension.Rows;
                     int columnsCount = sheet.Dimension.Columns;
@@ -525,15 +526,15 @@ namespace EwidOperaty
                             // dodawanie informacji o zgłoszeniach dla rekordów operatów
                             for (int i = 2; i <= rowsCount; i++)
                             {
-                                if (sheet.Cells[i, 38].Value == null) continue; //  jeśli operat nie ma przypisanego KERG to go pomiń
+                                if (sheet.Cells[i, 39].Value == null) continue; //  jeśli operat nie ma przypisanego KERG to go pomiń
 
-                                int kergId = (int)sheet.Cells[i, 38].Value;
+                                int kergId = (int)sheet.Cells[i, 39].Value;
 
-                                sheet.Cells[i, 39].Value = DbDictionary.PzgZgloszenie.GetPzgIdZgloszenia(kergId);
-                                sheet.Cells[i, 40].Value = DbDictionary.PzgZgloszenie.GetPzgDataZgloszenia(kergId);
-                                sheet.Cells[i, 41].Value = DbDictionary.PzgZgloszenie.GetObreb(kergId);
-                                sheet.Cells[i, 42].Value = DbDictionary.PzgZgloszenie.GetPzgRodzaj(kergId);
-                                sheet.Cells[i, 43].Value = DbDictionary.PzgZgloszenie.GetOsobaUprawniona(kergId);
+                                sheet.Cells[i, 40].Value = DbDictionary.PzgZgloszenie.GetPzgIdZgloszenia(kergId);
+                                sheet.Cells[i, 41].Value = DbDictionary.PzgZgloszenie.GetPzgDataZgloszenia(kergId);
+                                sheet.Cells[i, 42].Value = DbDictionary.PzgZgloszenie.GetObreb(kergId);
+                                sheet.Cells[i, 43].Value = DbDictionary.PzgZgloszenie.GetPzgRodzaj(kergId);
+                                sheet.Cells[i, 44].Value = DbDictionary.PzgZgloszenie.GetOsobaUprawniona(kergId);
                             }
 
                             sheet.Cells[2, 1, rowsCount, columnsCount - 6].Style.Border.BorderAround(ExcelBorderStyle.Medium);
@@ -541,309 +542,339 @@ namespace EwidOperaty
 
                             sheet.View.FreezePanes(2, 3);
 
-                            sheet.Cells[1, 1].Value = "IdOp";
+                            sheet.Cells[1, 1].Value = "IdOp\n[1]";
                             sheet.Column(1).Width = 8;
                             sheet.Cells[2, 1, rowsCount + 1000, 1].Style.Numberformat.Format = "General";
                             sheet.Column(1).Hidden = true;
 
-                            sheet.Cells[1, 2].Value = "PzgIdMaterialu";
+                            sheet.Cells[1, 2].Value = "PzgIdMaterialu\n[2]";
                             sheet.Cells[1, 2].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
                             sheet.Column(2).Width = 19; 
                             sheet.Cells[2, 2, rowsCount + 1000, 2].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 3].Value = "PzgData\nPrzyjecia";
+                            sheet.Cells[1, 3].Value = "PzgData\nPrzyjecia\n[3]";
                             sheet.Cells[1, 3].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
                             sheet.Cells[2, 3, rowsCount + 1000, 3].Style.Numberformat.Format = "yyyy-MM-dd";
                             sheet.Column(3).Width = 11; 
                             
-                            sheet.Cells[1, 4].Value = "Data\nWplywu";
+                            sheet.Cells[1, 4].Value = "Data\nWplywu\n[4]";
                             sheet.Cells[1, 4].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
                             sheet.Cells[2, 4, rowsCount + 1000, 4].Style.Numberformat.Format = "yyyy-MM-dd";
                             sheet.Column(4).Width = 11;
 
-                            sheet.Cells[1, 5].Value = "PzgNazwa";
+                            sheet.Cells[1, 5].Value = "PzgNazwa\n[5]";
                             sheet.Cells[1, 5].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255,235,156));
                             sheet.Column(5).Width = 17; 
                             sheet.Cells[2, 5, rowsCount + 1000, 5].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 6].Value = "PzgPolozenie\nObszaru";
+                            sheet.Cells[1, 6].Value = "PzgPolozenie\nObszaru\n[6]";
                             sheet.Cells[1, 6].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
                             sheet.Column(6).Width = 13;
                             sheet.Cells[2, 6, rowsCount + 1000, 6].Style.Numberformat.Format = "General";
 
-                            sheet.Cells[1, 7].Value = "Obreb";
-                            sheet.Cells[1, 7].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
+                            sheet.Cells[1, 7].Value = "Obreb\n[7]";
+                            sheet.Cells[1, 7].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
                             sheet.Column(7).Width = 14; 
                             sheet.Cells[2, 7, rowsCount + 1000, 7].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 8].Value = "PzgTworcaNazwa";
-                            sheet.Cells[1, 8].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
+                            sheet.Cells[1, 8].Value = "PzgTworcaOsobaId\n[8]";
+                            //sheet.Cells[1, 8].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
                             sheet.Column(8).Width = 40; 
                             sheet.Cells[2, 8, rowsCount + 1000, 8].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 9].Value = "PzgTworca\nRegon";
+                            sheet.Cells[1, 9].Value = "PzgTworcaNazwa\n[9]";
                             sheet.Cells[1, 9].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
+                            sheet.Column(9).Width = 40; 
                             sheet.Cells[2, 9, rowsCount + 1000, 9].Style.Numberformat.Format = "@";
-                            sheet.Column(9).Width = 11; 
 
-                            sheet.Cells[1, 10].Value = "PzgTworca\nPesel";
+                            sheet.Cells[1, 10].Value = "PzgTworca\nRegon\n[10]";
+                            //sheet.Cells[1, 10].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
                             sheet.Cells[2, 10, rowsCount + 1000, 10].Style.Numberformat.Format = "@";
                             sheet.Column(10).Width = 11; 
 
-                            sheet.Cells[1, 11].Value = "PzgSposob\nPozyskania";
-                            sheet.Cells[1, 11].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
+                            sheet.Cells[1, 11].Value = "PzgTworca\nPesel\n[11]";
                             sheet.Cells[2, 11, rowsCount + 1000, 11].Style.Numberformat.Format = "@";
-                            sheet.Column(11).Width = 26; 
+                            sheet.Column(11).Width = 11; 
 
-                            sheet.Cells[1, 12].Value = "PzgPostac\nMaterialu";
+                            sheet.Cells[1, 12].Value = "PzgSposob\nPozyskania\n[12]";
                             sheet.Cells[1, 12].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Cells[2, 12, rowsCount + 1000, 12].Style.Numberformat.Format = "@";
-                            sheet.Column(12).Width = 16;
+                            sheet.Column(12).Width = 26; 
 
-                            sheet.Cells[1, 13].Value = "PzgRodz\nNosnika";
+                            sheet.Cells[1, 13].Value = "PzgPostac\nMaterialu\n[13]";
                             sheet.Cells[1, 13].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Cells[2, 13, rowsCount + 1000, 13].Style.Numberformat.Format = "@";
-                            sheet.Column(13).Width = 15;
+                            sheet.Column(13).Width = 16;
 
-                            sheet.Cells[1, 14].Value = "PzgDostep";
+                            sheet.Cells[1, 14].Value = "PzgRodz\nNosnika\n[14]";
                             sheet.Cells[1, 14].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
-                            sheet.Column(14).Width = 16; 
                             sheet.Cells[2, 14, rowsCount + 1000, 14].Style.Numberformat.Format = "@";
+                            sheet.Column(14).Width = 15;
 
-                            sheet.Cells[1, 15].Value = "PzgPrzyczynyOgraniczen";
+                            sheet.Cells[1, 15].Value = "PzgDostep\n[15]";
                             sheet.Cells[1, 15].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
-                            sheet.Column(15).Width = 39; 
+                            sheet.Column(15).Width = 16; 
                             sheet.Cells[2, 15, rowsCount + 1000, 15].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 16].Value = "PzgTyp\nMaterialu";
+                            sheet.Cells[1, 16].Value = "PzgPrzyczynyOgraniczen\n[16]";
                             sheet.Cells[1, 16].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
+                            sheet.Column(16).Width = 39; 
                             sheet.Cells[2, 16, rowsCount + 1000, 16].Style.Numberformat.Format = "@";
-                            sheet.Column(16).Width = 12; 
 
-                            sheet.Cells[1, 17].Value = "PzgKat\nArchiwalna";
+                            sheet.Cells[1, 17].Value = "PzgTyp\nMaterialu\n[17]";
                             sheet.Cells[1, 17].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Cells[2, 17, rowsCount + 1000, 17].Style.Numberformat.Format = "@";
-                            sheet.Column(17).Width = 11;
+                            sheet.Column(17).Width = 12; 
 
-                            sheet.Cells[1, 18].Value = "PzgJezyk";
+                            sheet.Cells[1, 18].Value = "PzgKat\nArchiwalna\n[18]";
                             sheet.Cells[1, 18].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
-                            sheet.Column(18).Width = 9; 
                             sheet.Cells[2, 18, rowsCount + 1000, 18].Style.Numberformat.Format = "@";
+                            sheet.Column(18).Width = 11;
 
-                            sheet.Cells[1, 19].Value = "PzgOpis";
-                            sheet.Cells[1, 19].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
+                            sheet.Cells[1, 19].Value = "PzgJezyk\n[19]";
+                            sheet.Cells[1, 19].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Column(19).Width = 9; 
                             sheet.Cells[2, 19, rowsCount + 1000, 19].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 20].Value = "PzgOznMaterialu\nZasobu";
-                            sheet.Cells[1, 20].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
+                            sheet.Cells[1, 20].Value = "PzgOpis\n[20]";
+                            sheet.Cells[1, 20].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
+                            sheet.Column(20).Width = 9; 
                             sheet.Cells[2, 20, rowsCount + 1000, 20].Style.Numberformat.Format = "@";
-                            sheet.Column(20).Width = 21; 
 
-                            sheet.Cells[1, 21].Value = "OznMaterialu\nZasobu\nTyp";
-                            sheet.Cells[1, 21].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
+                            sheet.Cells[1, 21].Value = "PzgOznMaterialu\nZasobu\n[21]";
+                            sheet.Cells[1, 21].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
                             sheet.Cells[2, 21, rowsCount + 1000, 21].Style.Numberformat.Format = "@";
-                            sheet.Column(21).Width = 13; 
+                            sheet.Column(21).Width = 21; 
 
-                            sheet.Cells[1, 22].Value = "OznMaterialu\nZasobu\nJedn";
-                            sheet.Cells[1, 22].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
+                            sheet.Cells[1, 22].Value = "OznMaterialu\nZasobu\nTyp\n[22]";
+                            //sheet.Cells[1, 22].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
                             sheet.Cells[2, 22, rowsCount + 1000, 22].Style.Numberformat.Format = "@";
                             sheet.Column(22).Width = 13; 
 
-                            sheet.Cells[1, 23].Value = "OznMaterialu\nZasobu\nNr";
+                            sheet.Cells[1, 23].Value = "OznMaterialu\nZasobu\nJedn\n[23]";
                             sheet.Cells[1, 23].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
+                            sheet.Cells[2, 23, rowsCount + 1000, 23].Style.Numberformat.Format = "@";
                             sheet.Column(23).Width = 13; 
-                            sheet.Cells[2, 23, rowsCount + 1000, 23].Style.Numberformat.Format = "General";
 
-                            sheet.Cells[1, 24].Value = "OznMaterialu\nZasobu\nRok";
+                            sheet.Cells[1, 24].Value = "OznMaterialu\nZasobu\nNr\n[24]";
                             sheet.Cells[1, 24].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
                             sheet.Column(24).Width = 13; 
                             sheet.Cells[2, 24, rowsCount + 1000, 24].Style.Numberformat.Format = "General";
 
-                            sheet.Cells[1, 25].Value = "OznMaterialu\nZasobu\nTom";
+                            sheet.Cells[1, 25].Value = "OznMaterialu\nZasobu\nRok\n[25]";
                             sheet.Cells[1, 25].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
                             sheet.Column(25).Width = 13; 
                             sheet.Cells[2, 25, rowsCount + 1000, 25].Style.Numberformat.Format = "General";
 
-                            sheet.Cells[1, 26].Value = "OznMaterialu\nZasobu\nSepJednNr";
+                            sheet.Cells[1, 26].Value = "OznMaterialu\nZasobu\nTom\n[26]";
                             sheet.Cells[1, 26].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
-                            sheet.Cells[2, 26, rowsCount + 1000, 26].Style.Numberformat.Format = "@";
                             sheet.Column(26).Width = 13; 
+                            sheet.Cells[2, 26, rowsCount + 1000, 26].Style.Numberformat.Format = "General";
 
-                            sheet.Cells[1, 27].Value = "OznMaterialu\nZasobu\nSepnrRok";
-                            sheet.Cells[1, 27].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
+                            sheet.Cells[1, 27].Value = "OznMaterialu\nZasobu\nSepJednNr\n[27]";
+                            //sheet.Cells[1, 27].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
                             sheet.Cells[2, 27, rowsCount + 1000, 27].Style.Numberformat.Format = "@";
                             sheet.Column(27).Width = 13; 
 
-                            sheet.Cells[1, 28].Value = "Pzg\nDokument\nWyl";
+                            sheet.Cells[1, 28].Value = "OznMaterialu\nZasobu\nSepnrRok\n[28]";
+                            //sheet.Cells[1, 28].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206));
                             sheet.Cells[2, 28, rowsCount + 1000, 28].Style.Numberformat.Format = "@";
-                            sheet.Column(28).Width = 15; 
+                            sheet.Column(28).Width = 13; 
 
-                            sheet.Cells[1, 29].Value = "PzgData\nWyl";
-                            sheet.Cells[2, 29, rowsCount + 1000, 29].Style.Numberformat.Format = "yyyy-MM-dd";
-                            sheet.Column(29).Width = 11; 
+                            sheet.Cells[1, 29].Value = "Pzg\nDokument\nWyl\n[29]";
+                            sheet.Cells[2, 29, rowsCount + 1000, 29].Style.Numberformat.Format = "@";
+                            sheet.Column(29).Width = 15; 
 
-                            sheet.Cells[1, 30].Value = "PzgData\nArch\nLubBrak";
+                            sheet.Cells[1, 30].Value = "PzgData\nWyl\n[30]";
                             sheet.Cells[2, 30, rowsCount + 1000, 30].Style.Numberformat.Format = "yyyy-MM-dd";
-                            sheet.Column(30).Width = 11;
+                            sheet.Column(30).Width = 11; 
 
-                            sheet.Cells[1, 31].Value = "PzgCel";
-                            sheet.Cells[1, 31].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
-                            sheet.Column(31).Width = 40; 
-                            sheet.Cells[2, 31, rowsCount + 1000, 31].Style.Numberformat.Format = "@";
+                            sheet.Cells[1, 31].Value = "PzgData\nArch\nLubBrak\n[31]";
+                            sheet.Cells[2, 31, rowsCount + 1000, 31].Style.Numberformat.Format = "yyyy-MM-dd";
+                            sheet.Column(31).Width = 11;
 
-                            sheet.Cells[1, 32].Value = "Cel\nArchiwalny";
-                            sheet.Cells[1, 32].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
-                            sheet.Cells[2, 32, rowsCount + 1000, 32].Style.Numberformat.Format = "@";
+                            sheet.Cells[1, 32].Value = "PzgCel\n[32]";
+                            sheet.Cells[1, 32].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Column(32).Width = 40; 
+                            sheet.Cells[2, 32, rowsCount + 1000, 32].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 33].Value = "Dzialka\nPrzed";
-                            sheet.Cells[1, 33].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
+                            sheet.Cells[1, 33].Value = "Cel Archiwalny\n[33]";
+                            sheet.Cells[1, 33].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Cells[2, 33, rowsCount + 1000, 33].Style.Numberformat.Format = "@";
-                            sheet.Column(33).Width = 25;
+                            sheet.Column(33).Width = 40; 
 
-                            IExcelConditionalFormattingExpression cfRuleDzPrzed = sheet.ConditionalFormatting.AddExpression(sheet.Cells[2, 33, rowsCount + 1000, 33]);
-                            cfRuleDzPrzed.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            cfRuleDzPrzed.Style.Fill.BackgroundColor.Color = Color.Yellow;
-                            cfRuleDzPrzed.Formula = "= CheckDzialka(AG2) <> 0";
-
-                            sheet.Cells[1, 34].Value = "Dzialka\nPo";
-                            sheet.Cells[1, 34].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
+                            sheet.Cells[1, 34].Value = "Dzialka Przed\n[34]";
+                            sheet.Cells[1, 34].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Cells[2, 34, rowsCount + 1000, 34].Style.Numberformat.Format = "@";
                             sheet.Column(34).Width = 25;
 
-                            sheet.Cells[1, 35].Value = "Opis2";
-                            sheet.Column(35).Width = 25; 
+                            sheet.Cells[1, 35].Value = "Dzialka Po\n[35]";
+                            sheet.Cells[1, 35].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Cells[2, 35, rowsCount + 1000, 35].Style.Numberformat.Format = "@";
+                            sheet.Column(35).Width = 25;
 
-                            sheet.Cells[1, 36].Value = "Liczba\nSkanów";
-                            sheet.Column(36).Width = 9;
-                            sheet.Cells[2, 36, rowsCount + 1000, 36].Style.Numberformat.Format = "General";
+                            sheet.Cells[1, 36].Value = "Opis2\n[36]";
+                            sheet.Column(36).Width = 25; 
+                            sheet.Cells[2, 36, rowsCount + 1000, 36].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 37].Value = "Liczba\nDokS";
+                            sheet.Cells[1, 37].Value = "Liczba\nSkanów\n[37]";
                             sheet.Column(37).Width = 9;
                             sheet.Cells[2, 37, rowsCount + 1000, 37].Style.Numberformat.Format = "General";
 
-                            sheet.Cells[1, 38].Value = "KergId";
-                            sheet.Column(38).Width = 8;
+                            sheet.Cells[1, 38].Value = "Liczba\nDokS\n[38]";
+                            sheet.Column(38).Width = 9;
                             sheet.Cells[2, 38, rowsCount + 1000, 38].Style.Numberformat.Format = "General";
-                            sheet.Column(38).Hidden = true;
 
-                            sheet.Cells[1, 39].Value = "PzgIdZgloszenia";
-                            sheet.Cells[1, 39].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
-                            sheet.Column(39).Width = 20;
-                            sheet.Cells[2, 39, rowsCount + 1000, 39].Style.Numberformat.Format = "@";
+                            sheet.Cells[1, 39].Value = "KergId\n[39]";
+                            sheet.Column(39).Width = 8;
+                            sheet.Cells[2, 39, rowsCount + 1000, 39].Style.Numberformat.Format = "General";
+                            sheet.Column(39).Hidden = true;
 
-                            sheet.Cells[1, 40].Value = "PzgDataZgloszenia";
+                            sheet.Cells[1, 40].Value = "PzgIdZgloszenia\n[40]";
                             sheet.Cells[1, 40].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
-                            sheet.Column(40).Width = 11;
-                            sheet.Cells[2, 40, rowsCount + 1000, 40].Style.Numberformat.Format = "yyyy-MM-dd";
+                            sheet.Column(40).Width = 20;
+                            sheet.Cells[2, 40, rowsCount + 1000, 40].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 41].Value = "Obreb";
+                            sheet.Cells[1, 41].Value = "PzgDataZgloszenia\n[41]";
                             sheet.Cells[1, 41].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
-                            sheet.Column(41).Width = 14;
-                            sheet.Cells[2, 41, rowsCount + 1000, 41].Style.Numberformat.Format = "@";
+                            sheet.Column(41).Width = 11;
+                            sheet.Cells[2, 41, rowsCount + 1000, 41].Style.Numberformat.Format = "yyyy-MM-dd";
 
-                            sheet.Cells[1, 42].Value = "PzgRodzaj";
+                            sheet.Cells[1, 42].Value = "Obreb\n[42]";
                             sheet.Cells[1, 42].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
-                            sheet.Column(42).Width = 40;
+                            sheet.Column(42).Width = 14;
                             sheet.Cells[2, 42, rowsCount + 1000, 42].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 43].Value = "OsobaUprawniona";
-                            sheet.Cells[1, 43].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206));
+                            sheet.Cells[1, 43].Value = "PzgRodzaj\n[43]";
+                            sheet.Cells[1, 43].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
                             sheet.Column(43).Width = 40;
                             sheet.Cells[2, 43, rowsCount + 1000, 43].Style.Numberformat.Format = "@";
 
+                            sheet.Cells[1, 44].Value = "OsobaUprawniona\n[44]";
+                            sheet.Cells[1, 44].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 235, 156));
+                            sheet.Column(44).Width = 40;
+                            sheet.Cells[2, 44, rowsCount + 1000, 44].Style.Numberformat.Format = "@";
 
+                            // FORMATOWANIE WARUNKOWE
+                            
+                            IExcelConditionalFormattingExpression cfRuleDzPrzed = sheet.ConditionalFormatting.AddExpression(sheet.Cells[2, 34, rowsCount + 1000, 34]);
+                            cfRuleDzPrzed.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            cfRuleDzPrzed.Style.Fill.BackgroundColor.Color = Color.Yellow;
+                            cfRuleDzPrzed.Formula = "= CheckDzialka(AH2) <> 0";
 
+                            IExcelConditionalFormattingExpression cfRuleDzPo = sheet.ConditionalFormatting.AddExpression(sheet.Cells[2, 35, rowsCount + 1000, 35]);
+                            cfRuleDzPo.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            cfRuleDzPo.Style.Fill.BackgroundColor.Color = Color.Yellow;
+                            cfRuleDzPo.Formula = "= CheckDzialka(AI2) <> 0";
 
+                            // SŁOWNIKI i POPRAWNOŚĆ DANYCH
+
+                            // P musi mieć 3 kropki [2]
                             IExcelDataValidationCustom valPzgIdMaterialu = sheet.DataValidations.AddCustomValidation($"B2:B{rowsCount + 1000}");
                             valPzgIdMaterialu.ShowErrorMessage = true;
                             valPzgIdMaterialu.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgIdMaterialu.AllowBlank = true;
+                            valPzgIdMaterialu.AllowBlank = false;
                             valPzgIdMaterialu.Formula.ExcelFormula = "=LEN(B2) - LEN(SUBSTITUTE(B2,\".\",\"\")) = 3";
 
+                            // data przyjęcia między 1900 a dniem wygenerowania arkusza [3]
                             IExcelDataValidationDateTime valPzgDataPrzyjecia = sheet.DataValidations.AddDateTimeValidation($"C2:C{rowsCount + 1000}");
                             valPzgDataPrzyjecia.ShowErrorMessage = true;
                             valPzgDataPrzyjecia.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgDataPrzyjecia.AllowBlank = true;
+                            valPzgDataPrzyjecia.AllowBlank = false;
                             valPzgDataPrzyjecia.Formula.Value = DateTime.Parse("1900-01-01");
-                            valPzgDataPrzyjecia.Formula2.Value = DateTime.Parse("2019-12-31");
+                            valPzgDataPrzyjecia.Formula2.Value = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
 
+                            // data wpływu między 1900 a dniem wygenerowania arkusza [4]
                             IExcelDataValidationDateTime valDataWplywu = sheet.DataValidations.AddDateTimeValidation($"D2:D{rowsCount + 1000}");
                             valDataWplywu.ShowErrorMessage = true;
                             valDataWplywu.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valDataWplywu.AllowBlank = true;
+                            valDataWplywu.AllowBlank = false;
                             valDataWplywu.Formula.Value = DateTime.Parse("1900-01-01");
-                            valDataWplywu.Formula2.Value = DateTime.Parse("2019-12-31");
+                            valDataWplywu.Formula2.Value = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
 
+                            // nazwa materialu ze słownika PZG_NazwaMat [5]
                             IExcelDataValidationList valPzgNazwa = sheet.DataValidations.AddListValidation($"E2:E{rowsCount + 1000}");
                             valPzgNazwa.ShowErrorMessage = true;
                             valPzgNazwa.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgNazwa.AllowBlank = true;
+                            valPzgNazwa.AllowBlank = false;
                             valPzgNazwa.Formula.ExcelFormula = "=PZG_NazwaMat";
 
-                            IExcelDataValidationInt valObreb = sheet.DataValidations.AddTextLengthValidation($"G2:G{rowsCount + 1000}");
+                            // nazwa obrębu ze słownika
+                            IExcelDataValidationList valObreb = sheet.DataValidations.AddListValidation($"G2:G{rowsCount + 1000}");
                             valObreb.ShowErrorMessage = true;
                             valObreb.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valObreb.AllowBlank = true;
-                            valObreb.Operator = ExcelDataValidationOperator.equal;
-                            valObreb.Formula.Value = 13;
+                            valObreb.AllowBlank = false;
+                            valObreb.Formula.ExcelFormula = "=EGB_ObrebEwidencyjny";
 
-                            IExcelDataValidationList valPzgSposobPozyskania = sheet.DataValidations.AddListValidation($"K2:K{rowsCount + 1000}");
+                            // sposób pozyskania ze słownika
+                            IExcelDataValidationList valPzgSposobPozyskania = sheet.DataValidations.AddListValidation($"L2:L{rowsCount + 1000}");
                             valPzgSposobPozyskania.ShowErrorMessage = true;
                             valPzgSposobPozyskania.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgSposobPozyskania.AllowBlank = true;
+                            valPzgSposobPozyskania.AllowBlank = false;
                             valPzgSposobPozyskania.Formula.ExcelFormula = "=PZG_SposobPozyskania";
 
-                            IExcelDataValidationList valPzgPostacMaterialu = sheet.DataValidations.AddListValidation($"L2:L{rowsCount + 1000}");
+                            // postać materiału ze słownika
+                            IExcelDataValidationList valPzgPostacMaterialu = sheet.DataValidations.AddListValidation($"M2:M{rowsCount + 1000}");
                             valPzgPostacMaterialu.ShowErrorMessage = true;
                             valPzgPostacMaterialu.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgPostacMaterialu.AllowBlank = true;
+                            valPzgPostacMaterialu.AllowBlank = false;
                             valPzgPostacMaterialu.Formula.ExcelFormula = "=PZG_Postac";
 
-                            IExcelDataValidationList valPzgRodzNosnika = sheet.DataValidations.AddListValidation($"M2:M{rowsCount + 1000}");
+                            // rodzaj nośnika ze słownika
+                            IExcelDataValidationList valPzgRodzNosnika = sheet.DataValidations.AddListValidation($"N2:N{rowsCount + 1000}");
                             valPzgRodzNosnika.ShowErrorMessage = true;
                             valPzgRodzNosnika.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgRodzNosnika.AllowBlank = true;
+                            valPzgRodzNosnika.AllowBlank = false;
                             valPzgRodzNosnika.Formula.ExcelFormula = "=PZG_NosnikNieelektroniczny";
 
-                            IExcelDataValidationList valPzgDostep = sheet.DataValidations.AddListValidation($"N2:N{rowsCount + 1000}");
+                            // rodzaj dostępu ze słownika
+                            IExcelDataValidationList valPzgDostep = sheet.DataValidations.AddListValidation($"O2:O{rowsCount + 1000}");
                             valPzgDostep.ShowErrorMessage = true;
                             valPzgDostep.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgDostep.AllowBlank = true;
+                            valPzgDostep.AllowBlank = false;
                             valPzgDostep.Formula.ExcelFormula = "=PZG_RodzajDostepu";
 
-                            IExcelDataValidationList valPzgTypMaterialu = sheet.DataValidations.AddListValidation($"P2:P{rowsCount + 1000}");
+                            // typ materialu ze słownika
+                            IExcelDataValidationList valPzgTypMaterialu = sheet.DataValidations.AddListValidation($"Q2:Q{rowsCount + 1000}");
                             valPzgTypMaterialu.ShowErrorMessage = true;
                             valPzgTypMaterialu.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgTypMaterialu.AllowBlank = true;
+                            valPzgTypMaterialu.AllowBlank = false;
                             valPzgTypMaterialu.Formula.ExcelFormula = "=PZG_TypMaterialu";
 
-                            IExcelDataValidationList valPzgKatArchiwalna = sheet.DataValidations.AddListValidation($"Q2:Q{rowsCount + 1000}");
+                            // kategoria archiwalna ze słownika
+                            IExcelDataValidationList valPzgKatArchiwalna = sheet.DataValidations.AddListValidation($"R2:R{rowsCount + 1000}");
                             valPzgKatArchiwalna.ShowErrorMessage = true;
                             valPzgKatArchiwalna.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgKatArchiwalna.AllowBlank = true;
+                            valPzgKatArchiwalna.AllowBlank = false;
                             valPzgKatArchiwalna.Formula.ExcelFormula = "=PZG_KatArchiw";
 
-                            IExcelDataValidationDateTime valPzgDataZgloszenia = sheet.DataValidations.AddDateTimeValidation($"AN2:AN{rowsCount + 1000}");
+                            // numer zgloszenia ze słownika ze słownika
+                            IExcelDataValidationList valPzgIdZgloszenia = sheet.DataValidations.AddListValidation($"AN2:AN{rowsCount + 1000}");
+                            valPzgIdZgloszenia.ShowErrorMessage = true;
+                            valPzgIdZgloszenia.ErrorStyle = ExcelDataValidationWarningStyle.stop;
+                            valPzgIdZgloszenia.AllowBlank = false;
+                            valPzgIdZgloszenia.Formula.ExcelFormula = "=PZG_IdZgloszenia";
+
+                            // data zgłoszenia z zakresu
+                            IExcelDataValidationDateTime valPzgDataZgloszenia = sheet.DataValidations.AddDateTimeValidation($"AO2:AO{rowsCount + 1000}");
                             valPzgDataZgloszenia.ShowErrorMessage = true;
                             valPzgDataZgloszenia.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgDataZgloszenia.AllowBlank = true;
+                            valPzgDataZgloszenia.AllowBlank = false;
                             valPzgDataZgloszenia.Formula.Value = DateTime.Parse("1900-01-01");
-                            valPzgDataZgloszenia.Formula2.Value = DateTime.Parse("2019-12-31");
+                            valPzgDataZgloszenia.Formula2.Value = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd"));
 
-                            IExcelDataValidationInt valObrebZgl = sheet.DataValidations.AddTextLengthValidation($"AO2:AO{rowsCount + 1000}");
+                            // obręb ze słownika
+                            IExcelDataValidationList valObrebZgl = sheet.DataValidations.AddListValidation($"AP2:AP{rowsCount + 1000}");
                             valObrebZgl.ShowErrorMessage = true;
                             valObrebZgl.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valObrebZgl.AllowBlank = true;
-                            valObrebZgl.Operator = ExcelDataValidationOperator.equal;
-                            valObrebZgl.Formula.Value = 13;
+                            valObrebZgl.AllowBlank = false;
+                            valObrebZgl.Formula.ExcelFormula = "=EGB_ObrebEwidencyjny";
 
-                            IExcelDataValidationList valPzgRodzaj = sheet.DataValidations.AddListValidation($"AP2:AP{rowsCount + 1000}");
+                            // rodzaj pracy ze słownika
+                            IExcelDataValidationList valPzgRodzaj = sheet.DataValidations.AddListValidation($"AQ2:AQ{rowsCount + 1000}");
                             valPzgRodzaj.ShowErrorMessage = true;
                             valPzgRodzaj.ErrorStyle = ExcelDataValidationWarningStyle.stop;
-                            valPzgRodzaj.AllowBlank = true;
+                            valPzgRodzaj.AllowBlank = false;
                             valPzgRodzaj.Formula.ExcelFormula = "=PZG_RodzajPracy";
 
                             break;
@@ -852,77 +883,81 @@ namespace EwidOperaty
 
                             sheet.View.FreezePanes(2, 3);
 
-                            sheet.Cells[1, 1].Value = "KergId";
+                            sheet.Cells[1, 1].Value = "KergId\n[1]";
                             sheet.Column(1).Width = 8;  
                             sheet.Cells[2, 1, rowsCount, 1].Style.Numberformat.Format = "General";
 
-                            sheet.Cells[1, 2].Value = "PzgIdZgloszenia";
+                            sheet.Cells[1, 2].Value = "IdZgloszenia\n[2]";
                             sheet.Column(2).Width = 20; 
                             sheet.Cells[2, 2, rowsCount, 2].Style.Numberformat.Format = "@";
 
-                            sheet.Cells[1, 3].Value = "PzgData\nZgloszenia";
+                            sheet.Cells[1, 3].Value = "Data\nZgloszenia\n[3]";
                             sheet.Column(3).Width = 11;
                             sheet.Cells[2, 3, rowsCount, 3].Style.Numberformat.Format = "yyyy-MM-dd";
 
-                            sheet.Cells[1, 4].Value = "IdZgloszenia\nJedn";
+                            sheet.Cells[1, 4].Value = "Jedn\n[4]";
                             sheet.Cells[2, 4, rowsCount, 4].Style.Numberformat.Format = "@";
                             sheet.Column(4).Width = 12;
 
-                            sheet.Cells[1, 5].Value = "IdZgloszenia\nNr";
+                            sheet.Cells[1, 5].Value = "Nr\n[5]";
                             sheet.Cells[2, 5, rowsCount, 5].Style.Numberformat.Format = "General";
                             sheet.Column(5).Width = 12;
 
-                            sheet.Cells[1, 6].Value = "IdZgloszenia\nRok";
+                            sheet.Cells[1, 6].Value = "Rok\n[6]";
                             sheet.Cells[2, 6, rowsCount, 6].Style.Numberformat.Format = "General";
                             sheet.Column(6).Width = 12;
 
-                            sheet.Cells[1, 7].Value = "IdZgloszenia\nEtap";
+                            sheet.Cells[1, 7].Value = "Etap\n[7]";
                             sheet.Cells[2, 7, rowsCount, 7].Style.Numberformat.Format = "General";
                             sheet.Column(7).Width = 12;
 
-                            sheet.Cells[1, 8].Value = "IdZgloszenia\nSep\nJednNr";
+                            sheet.Cells[1, 8].Value = "Sep\nJednNr\n[8]";
                             sheet.Cells[2, 8, rowsCount, 8].Style.Numberformat.Format = "@";
                             sheet.Column(8).Width = 12;
 
-                            sheet.Cells[1, 9].Value = "IdZgloszenia\nSep\nNrRok";
+                            sheet.Cells[1, 9].Value = "Sep\nNrRok\n[9]";
                             sheet.Cells[2, 9, rowsCount, 9].Style.Numberformat.Format = "@";
                             sheet.Column(9).Width = 12;
 
-                            sheet.Cells[1, 10].Value = "PzgPolozenie\nObszaru";
+                            sheet.Cells[1, 10].Value = "Polozenie\nObszaru\n[10]";
                             sheet.Cells[2, 10, rowsCount, 10].Style.Numberformat.Format = "@";
                             sheet.Column(10).Width = 13;
 
-                            sheet.Cells[1, 11].Value = "Obreb";
+                            sheet.Cells[1, 11].Value = "Obreb\n[11]";
                             sheet.Cells[2, 11, rowsCount, 11].Style.Numberformat.Format = "@";
                             sheet.Column(11).Width = 14;
 
-                            sheet.Cells[1, 12].Value = "PzgPodmiotZglaszajacyNazwa";
+                            sheet.Cells[1, 12].Value = "OsobaId\n[12]";
                             sheet.Cells[2, 12, rowsCount, 12].Style.Numberformat.Format = "@";
-                            sheet.Column(12).Width = 40;
+                            sheet.Column(12).Width = 14;
 
-                            sheet.Cells[1, 13].Value = "PzgPodmiot\nZglaszajacy\nRegon";
+                            sheet.Cells[1, 13].Value = "Podmiot\nNazwa\n[13]";
                             sheet.Cells[2, 13, rowsCount, 13].Style.Numberformat.Format = "@";
-                            sheet.Column(13).Width = 12;
+                            sheet.Column(13).Width = 40;
 
-                            sheet.Cells[1, 14].Value = "PzgPodmiot\nZglaszajacy\nPesel";
+                            sheet.Cells[1, 14].Value = "Podmiot\nRegon\n[14]";
                             sheet.Cells[2, 14, rowsCount, 14].Style.Numberformat.Format = "@";
                             sheet.Column(14).Width = 12;
 
-                            sheet.Cells[1, 15].Value = "PzgCel";
+                            sheet.Cells[1, 15].Value = "Podmiot\nPesel\n[15]";
                             sheet.Cells[2, 15, rowsCount, 15].Style.Numberformat.Format = "@";
-                            sheet.Column(15).Width = 40;
+                            sheet.Column(15).Width = 12;
 
-                            sheet.Cells[1, 16].Value = "Cel\nArchiwalny";
+                            sheet.Cells[1, 16].Value = "PzgCel\n[16]";
                             sheet.Cells[2, 16, rowsCount, 16].Style.Numberformat.Format = "@";
                             sheet.Column(16).Width = 40;
 
-                            sheet.Cells[1, 17].Value = "PzgRodzaj";
+                            sheet.Cells[1, 17].Value = "CelArchiwalny\n[17]";
                             sheet.Cells[2, 17, rowsCount, 17].Style.Numberformat.Format = "@";
                             sheet.Column(17).Width = 40;
 
-                            sheet.Cells[1, 18].Value = "OsobaUprawniona";
+                            sheet.Cells[1, 18].Value = "PzgRodzaj\n[18]";
                             sheet.Cells[2, 18, rowsCount, 18].Style.Numberformat.Format = "@";
                             sheet.Column(18).Width = 40;
+
+                            sheet.Cells[1, 19].Value = "OsobaUprawniona\n[19]";
+                            sheet.Cells[2, 19, rowsCount, 19].Style.Numberformat.Format = "@";
+                            sheet.Column(19).Width = 40;
 
                             break;
                     }
