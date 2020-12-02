@@ -85,12 +85,11 @@ namespace EwidOperaty.Tools
                         {
                             int pzgCelId = Convert.ToInt32(pzgCelIdLista);
 
-                            if (pzgCelId <= 21 && attrName == "pzg_cel")
+                            if (DbDictionary.PzgCelPracy.ContainsKey(pzgCelId))
                             {
                                 pzgCel = pzgCel + DbDictionary.PzgCelPracy[pzgCelId].GmlVal + "@";
                             }
-
-                            if (pzgCelId > 21 && attrName == "cel_archiwalny")
+                            else
                             {
                                 pzgCel = pzgCel + DbDictionary.SloCelPracyArchiwalny[pzgCelId].GmlVal + "@";
                             }
@@ -102,15 +101,7 @@ namespace EwidOperaty.Tools
                     {
                         int pzgCelId = Convert.ToInt32(pzgCeleLista);
 
-                        switch (attrName)
-                        {
-                            case "pzg_cel" when pzgCelId <= 21:
-                                return DbDictionary.PzgCelPracy[pzgCelId].GmlVal;
-                            case "cel_archiwalny" when pzgCelId > 21:
-                                return DbDictionary.SloCelPracyArchiwalny[pzgCelId].GmlVal;
-                            default:
-                                return string.Empty;
-                        }
+                        return DbDictionary.PzgCelPracy.ContainsKey(pzgCelId) ? DbDictionary.PzgCelPracy[pzgCelId].GmlVal : DbDictionary.SloCelPracyArchiwalny[pzgCelId].GmlVal;
                     }
 
                 case "pzg_rodzaj":
@@ -227,14 +218,13 @@ namespace EwidOperaty.Tools
                         {
                             int pzgCelId = Convert.ToInt32(pzgCelIdLista);
 
-                            if (pzgCelId <= 21 && attrName == "pzg_cel")
+                            if (DbDictionary.PzgCelPracy.ContainsKey(pzgCelId))
                             {
-                                pzgCel = pzgCel + DbDictionary.PzgCelPracy[pzgCelId].GmlVal + ";";
+                                pzgCel = pzgCel + DbDictionary.PzgCelPracy[pzgCelId].GmlVal + "@";
                             }
-
-                            if (pzgCelId > 21 && attrName == "cel_archiwalny")
+                            else
                             {
-                                pzgCel = pzgCel + DbDictionary.SloCelPracyArchiwalny[pzgCelId].GmlVal + ";";
+                                pzgCel = pzgCel + DbDictionary.SloCelPracyArchiwalny[pzgCelId].GmlVal + "@";
                             }
                         }
 
@@ -244,15 +234,7 @@ namespace EwidOperaty.Tools
                     {
                         int pzgCelId = Convert.ToInt32(pzgCeleLista);
 
-                        switch (attrName)
-                        {
-                            case "pzg_cel" when pzgCelId <= 21:
-                                return DbDictionary.PzgCelPracy[pzgCelId].GmlVal;
-                            case "cel_archiwalny" when pzgCelId > 21:
-                                return DbDictionary.SloCelPracyArchiwalny[pzgCelId].GmlVal;
-                            default:
-                                return string.Empty;
-                        }
+                        return DbDictionary.PzgCelPracy.ContainsKey(pzgCelId) ? DbDictionary.PzgCelPracy[pzgCelId].GmlVal : DbDictionary.SloCelPracyArchiwalny[pzgCelId].GmlVal;
                     }
 
                 case "dzialkaPrzed":
@@ -271,32 +253,6 @@ namespace EwidOperaty.Tools
         }
 
         #endregion Rozszerzenie dla Reader
-
-        public static bool Like(this string toSearch, string toFind)
-        {
-            if (toFind.StartsWith("%") && toFind.EndsWith("%"))
-            {
-                toFind = toFind.Replace("%", "");
-
-                return toSearch.Contains(toFind);
-            }
-
-            if (toFind.StartsWith("%") && !toFind.EndsWith("%"))
-            {
-                toFind = toFind.Replace("%", "");
-
-                return toSearch.EndsWith(toFind);
-            }
-
-            if (!toFind.StartsWith("%") && toFind.EndsWith("%"))
-            {
-                toFind = toFind.Replace("%", "");
-
-                return toSearch.StartsWith(toFind);
-            }
-
-            return false;
-        }
 
         public static void AddRange<T, TS>(this Dictionary<T, TS> source, Dictionary<T, TS> collection)
         {

@@ -136,6 +136,7 @@ namespace EwidOperaty
                 buttonConnect.Enabled = false;      //  dezaktywacja przycisku połączenia z bazą
                 buttonDisconnect.Enabled = true;    //  aktywacja przycisku rozłączenia z bazą
                 buttonOracleRead.Enabled = true;    //  aktywacja przycisku pobierania danych z bazy
+                buttonSaveBlobToDisk.Enabled = true;    // aktywacja przycisku zapisywania skanów operatow na dysk
             }
 
             toolStripStatusLabel.Text = oracleStatus.Text;
@@ -150,6 +151,7 @@ namespace EwidOperaty
             buttonDisconnect.Enabled = false;   //  dezaktywacja przycisku rozłączenia z bazą
             buttonOracleRead.Enabled = false;   //  dezaktywacja przycisku pobierania danych z bazy
             buttonSaveData.Enabled = false;     //  dezaktywacja przycisku zapisu danych do XLS
+            buttonSaveBlobToDisk.Enabled = false;
 
             checkedListBoxGminy.Items.Clear();
             checkedListBoxObreby.Items.Clear();
@@ -276,7 +278,6 @@ namespace EwidOperaty
             buttonOracleRead.Enabled = true;
             buttonDisconnect.Enabled = true;
             buttonSaveData.Enabled = true;
-            buttonSaveBlobToDisk.Enabled = true;
             buttonSaveWktToDisk.Enabled = true;
 
             toolStripStatusLabel.Text = $"Pobrano {DbDictionary.PzgMaterialZasobu.Count} operatów oraz {DbDictionary.PzgZgloszenie.Count} zgłoszeń z bazy.";
@@ -1122,6 +1123,8 @@ namespace EwidOperaty
             buttonOracleRead.Enabled = false;
             buttonSaveData.Enabled = false;
             buttonSaveWktToDisk.Enabled = false;
+
+            DbDictionary.SloSzczRodzDok = _oracleWorker.GetSloSzczRodzDokDict();
 
             _saveBlobBackgroundWorker.RunWorkerAsync(argument: fbd.SelectedPath);
         }

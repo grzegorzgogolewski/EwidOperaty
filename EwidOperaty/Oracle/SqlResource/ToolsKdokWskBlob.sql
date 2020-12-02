@@ -3,6 +3,7 @@
     kd.wl,
     kd.id_gr idop,
     op.idmaterialu,
+    op.sygnatura,
     op.obreb_id,
     kd.id_file,
     kd.path,
@@ -20,7 +21,8 @@ WHERE
     AND kd.wl = 'operat'
     AND kd.data_k IS NULL
     AND NVL(op.obreb_id, 0) = :obreb_id
-	--and op.idop IN (select idop  from gg_operaty)
+    --AND op.idop IN (select idop from gg_operaty)
+    --and op.idmaterialu IN (select idmaterialu  from gg_operaty)
     --AND op.idop IN (select idop from osr_operat WHERE rok_zgl >= 2019 OR IDMAT_ROK >= 2019)
 	--and kd.data_d >= TO_DATE('26-09-2019 00:00:00','DD-MM-YYYY hh24:mi:ss')
 UNION ALL
@@ -29,6 +31,7 @@ SELECT
     kd.wl,
     OP.idop idop,
     op.idmaterialu,
+    op.sygnatura,
     op.obreb_id,
     kd.id_file,
     kd.path,
@@ -47,6 +50,12 @@ WHERE
     AND kd.wl = 'szkice'
     AND kd.data_k IS NULL
 	AND NVL(op.obreb_id, 0) = :obreb_id
-	--and op.idop IN (select idop  from gg_operaty)
+    --AND op.idop IN (select idop from gg_operaty)
+    --and op.idmaterialu IN (select idmaterialu  from gg_operaty)
     --AND op.idop IN (select idop from osr_operat WHERE rok_zgl >= 2019 OR IDMAT_ROK >= 2019)
 	--and kd.data_d >= TO_DATE('26-09-2019 00:00:00','DD-MM-YYYY hh24:mi:ss')
+
+--delete from gg_operaty
+--where
+--idop NOT IN (select id_gr from kdok_wsk where wl = 'operat' AND data_d >= '2019-12-15')
+--AND idop NOT IN(SELECT idop FROM osr_operat_sklad WHERE mat_id IN (SELECT id_gr FROM kdok_wsk WHERE wl = 'szkice' AND data_d >= '2019-12-15'))

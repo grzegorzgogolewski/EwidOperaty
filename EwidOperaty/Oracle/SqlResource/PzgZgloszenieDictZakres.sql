@@ -19,4 +19,5 @@ FROM
     ewid4.osr_kerg zg
 WHERE 
     NVL(zg.obreb_id, 0) = :obreb_id
+    --AND zg.kerg_id = 0
 ORDER BY kerg_id

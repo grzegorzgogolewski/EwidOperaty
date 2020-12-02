@@ -2,6 +2,7 @@
 using EwidOperaty.Tools;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Oracle.ManagedDataAccess.Client;
@@ -128,7 +129,8 @@ namespace EwidOperaty.Oracle
                                 RodznosId = reader.GetIntId("rodznos_id"),
                                 Nazwa = reader.GetString("nazwa"),
                                 NazwaPelna = reader.GetString("nazwa_pelna"),
-                                GmlVal = GmlDictionaryValues.PzgNosnikNieelektroniczny[reader.GetIntId("rodznos_id") - 1]
+                                GmlVal = reader.GetString("nazwa")
+                                // GmlVal = GmlDictionaryValues.PzgNosnikNieelektroniczny[reader.GetIntId("rodznos_id") - 1]
                             };
 
                             nosnikNieelektronicznyDict.Add(nosnikNieelektroniczny.RodznosId, nosnikNieelektroniczny);
@@ -163,7 +165,8 @@ namespace EwidOperaty.Oracle
                             {
                                 TypMaterId = reader.GetIntId("typ_mater_id"),
                                 Nazwa = reader.GetString("nazwa"),
-                                GmlVal = GmlDictionaryValues.PzgTypMaterialu[reader.GetIntId("typ_mater_id") - 1]
+                                GmlVal = reader.GetString("nazwa")
+                                //GmlVal = GmlDictionaryValues.PzgTypMaterialu[reader.GetIntId("typ_mater_id") - 1]
                             };
 
                             typMaterialuDict.Add(pzgTypMaterialu.TypMaterId, pzgTypMaterialu);
@@ -200,7 +203,8 @@ namespace EwidOperaty.Oracle
                                 Nazwa = reader.GetString("nazwa"),
                                 NazwaPelna = reader.GetString("nazwa_pelna"),
                                 Typ = reader.GetInt32("typ"),
-                                GmlVal = GmlDictionaryValues.PzgNazwaMat[reader.GetIntId("nazmat_id") - 1]
+                                GmlVal = reader.GetString("nazwa")
+                                //GmlVal = GmlDictionaryValues.PzgNazwaMat[reader.GetIntId("nazmat_id") - 1]
                             };
 
                             nazwaMatDict.Add(nazwaMat.NazmatId, nazwaMat);
@@ -310,7 +314,11 @@ namespace EwidOperaty.Oracle
                                 Nazwa = reader.GetString("nazwa"),
                                 Skrot = reader.GetString("skrot"),
                                 NazwaSkr = reader.GetString("nazwa_skr"),
-                                GmlVal = GmlDictionaryValues.PzgCelPracy[reader.GetIntId("cel_id") - 1]
+                                GmlVal = reader.GetString("nazwa")
+                                //GmlVal = GmlDictionaryValues.PzgCelPracy[reader.GetIntId("cel_id") - 1]
+                                
+                                //todo Poprawic słownik
+
                             };
 
                             celPracyDict.Add(celPracy.CelId, celPracy);
@@ -383,7 +391,8 @@ namespace EwidOperaty.Oracle
                                 RodzId = reader.GetIntId("rodz_id"),
                                 Nazwa = reader.GetString("nazwa"),
                                 NazwaPelna = reader.GetString("nazwa_pelna"),
-                                GmlVal = GmlDictionaryValues.PzgRodzajPracy[reader.GetIntId("rodz_id") - 1]
+                                GmlVal = reader.GetString("nazwa")
+                                //GmlVal = GmlDictionaryValues.PzgRodzajPracy[reader.GetIntId("rodz_id") - 1]
                             };
 
                             rodzajPracyDict.Add(rodzajPracy.RodzId, rodzajPracy);
@@ -505,7 +514,8 @@ namespace EwidOperaty.Oracle
                                 SpospozId = reader.GetIntId("spospoz_id"),
                                 Nazwa = reader.GetString("nazwa"),
                                 NazwaPelna = reader.GetString("nazwa_pelna"),
-                                GmlVal = GmlDictionaryValues.PzgSposobPozyskania[reader.GetIntId("spospoz_id") - 1]
+                                GmlVal = reader.GetString("nazwa")
+                                //GmlVal = GmlDictionaryValues.PzgSposobPozyskania[reader.GetIntId("spospoz_id") - 1]
                             };
 
                             sposobPozyskaniaDict.Add(sposobPozyskania.SpospozId, sposobPozyskania);
@@ -803,8 +813,10 @@ namespace EwidOperaty.Oracle
                             DateTime dataD = (DateTime)reader["data_d"];
                             string wl = reader.GetString("wl");
 
-                            string outDirectory = DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) != string.Empty ?
-                                DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) : DbDictionary.PzgMaterialZasobu.GetOznMaterialuZasobu(idOp).Replace('/', '_');
+                            string idMaterialu = reader.GetString("idmaterialu");
+                            string sygnatura = reader.GetString("sygnatura");
+
+                            string outDirectory = string.IsNullOrEmpty(idMaterialu) ? sygnatura.Replace('/', '_'): idMaterialu;
 
                             if (!Directory.Exists(Path.Combine(dirName, obrebListId, outDirectory)))
                             {
@@ -878,6 +890,8 @@ namespace EwidOperaty.Oracle
                             DateTime dataD = (DateTime)reader["data_d"];
                             string wl = reader.GetString("wl");
 
+                            if (wl == "szkice") wl = "dok_skl";
+
                             if (!string.IsNullOrEmpty(geom))
                             {
                                 string outDirectory = DbDictionary.PzgMaterialZasobu.GetIdMaterialu(idOp) != string.Empty ?
@@ -891,9 +905,12 @@ namespace EwidOperaty.Oracle
                                 string prefix = DbDictionary.SloSzczRodzDok.GetPrefix(idRodzDok);
 
                                 string fileName = Path.GetFileNameWithoutExtension(typPliku);
-                                const string ext = ".wkt";
+                                string ext = Path.GetExtension(typPliku);
 
-                                typPliku = fileName + " [" + prefix + "]_[" + wl + "]" + ext;   
+                                // usunięcie z nazwy pliku niedzwolonych znaków i zastąpienie ich znakiem "_"
+                                fileName = string.Join("_", fileName.Split(Path.GetInvalidFileNameChars()));
+
+                                typPliku = $"{fileName}_[{ext}]_[{prefix}]_[{wl}].wkt";   
 
                                 string fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, typPliku);
 
@@ -901,7 +918,7 @@ namespace EwidOperaty.Oracle
 
                                 while (File.Exists(fileNameAndPath))
                                 {
-                                    typPliku = fileName + " [" + prefix + "]_[" + wl + "]_" + $"{counter++:000}" + ext;
+                                    typPliku = $"{fileName}_[{ext}]_[{prefix}]_[{wl}_{counter++:000}].wkt"; 
                                     fileNameAndPath = Path.Combine(dirName, obrebListId, outDirectory, typPliku);
                                 }
 
@@ -915,7 +932,7 @@ namespace EwidOperaty.Oracle
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(e.Message + "\n\n" + e.StackTrace, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
